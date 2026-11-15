@@ -1,10 +1,11 @@
 import { describeUrl } from './analytics.js';
 import { appendTime, readTime, timeKey, timePermissions } from './time-data.js';
+import { readSettings, matchesDomain, settingsKey } from './settings.js';
+import { initFocusEngine } from './focus-engine.js';
 
 const alarmName = 'daytrail-time';
 const idleSeconds = 60;
 const maxGap = 45_000;
-const retention = 90 * 86_400_000;
 let browserEpoch;
 
 async function getBrowserEpoch() {
@@ -29,11 +30,13 @@ async function currentSite() {
   const [tab] = await chrome.tabs.query({ active: true, windowId: window.id });
   if (tab?.incognito || tab?.discarded) return;
   const site = describeUrl(tab?.url)?.site;
-  if (site) return { site, windowId: window.id, tabId: tab.id };
+  const settings = await readSettings();
+  if (site && !settings.excludedSites.some(domain => matchesDomain(site, domain))) return { site, windowId: window.id, tabId: tab.id };
 }
 
 async function update(at, reason, site) {
   const state = await readTime();
+  const settings = await readSettings();
   const granted = await chrome.permissions.contains(timePermissions);
   const wasEnabled = state.enabled;
   if (reason === 'enable' && !granted) throw new Error('Tracking permission is required.');
@@ -52,22 +55,33 @@ async function update(at, reason, site) {
 
   // A late alarm may follow sleep or a suspended worker. Keep only time
   // bounded by a recent observation or a Chrome event ending that visit.
-  if (previous && wasEnabled && at - previous.since <= maxGap &&
+  if (previous && wasEnabled && !settings.excludedSites.some(domain => matchesDomain(previous.site, domain)) && at - previous.since <= maxGap &&
       (reason !== 'alarm' || sameContext)) {
     appendTime(state.sessions, previous.site, previous.since, at);
   }
   if (reason === 'erase') state.sessions = state.sessions.filter(([host]) => host !== site);
-  const cutoff = at - retention;
-  state.sessions = state.sessions.filter(([, , end]) => end > cutoff);
+  const cutoff = at - settings.retentionDays * 86_400_000;
+  const retained = state.sessions
+    .filter(([host, , end]) => end > cutoff && !settings.excludedSites.some(domain => matchesDomain(host, domain)))
+    .map(([host, start, end]) => [host, Math.max(start, cutoff), end]);
+  const retentionChanged = retained.length !== state.sessions.length || retained.some((entry, index) => entry[1] !== state.sessions[index][1]);
+  state.sessions = retained;
   state.checkpoint = next ? { ...next, since: Math.max(at, previous?.since ?? at), epoch } : null;
-  if (state.enabled || wasEnabled || reason === 'erase') {
+  // A settings removal follows Erase all data. With no recording or
+  // retention change, do not recreate an empty record after that erase.
+  if (state.enabled || wasEnabled || retentionChanged || ['erase', 'pause'].includes(reason)) {
     await chrome.storage.local.set({ [timeKey]: state });
   }
 
-  if (chrome.alarms) {
-    if (!state.enabled) await chrome.alarms.clear(alarmName);
-    else if (!await chrome.alarms.get(alarmName)) {
-      await chrome.alarms.create(alarmName, { periodInMinutes: 0.5 });
+  if (chrome.alarms && await chrome.permissions.contains({ permissions: ['alarms'] })) {
+    try {
+      if (!state.enabled) await chrome.alarms.clear(alarmName);
+      else if (!await chrome.alarms.get(alarmName)) {
+        await chrome.alarms.create(alarmName, { periodInMinutes: 0.5 });
+      }
+    } catch (error) {
+      // Chrome can retain a namespace whose permission was just revoked.
+      if (await chrome.permissions.contains({ permissions: ['alarms'] })) throw error;
     }
   }
 }
@@ -107,8 +121,11 @@ chrome.runtime.onInstalled.addListener(({ reason } = {}) => {
 chrome.permissions.onRemoved.addListener(({ permissions }) => {
   if (timePermissions.permissions.some((permission) => permissions?.includes(permission))) observe('inactive');
 });
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes[settingsKey]) observe('settings');
+});
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
-  if (sender.id !== chrome.runtime.id || !['enable', 'pause', 'erase'].includes(message?.timeAction)) return;
+  if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(chrome.runtime.getURL('')) || !['enable', 'pause', 'erase'].includes(message?.timeAction)) return;
   if (message.timeAction === 'erase' && typeof message.site !== 'string') return;
   const at = Date.now();
   serialize(async () => {
@@ -120,3 +137,5 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   }).then(() => reply({ ok: true }), () => reply({ ok: false }));
   return true;
 });
+
+initFocusEngine();

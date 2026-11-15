@@ -1,0 +1,33 @@
+html { width: 380px; height: 560px; overflow: hidden; }
+.toolbar-popup { width: 380px; min-width: 380px; height: 100vh; max-height: 560px; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px; overflow: hidden; }
+.popup-body { min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 0 4px 5px 0; scrollbar-gutter: stable; }
+.popup-trail { padding: 13px; margin-bottom: 12px; }
+.popup-trail h1 { margin: 0 0 6px; font-size: 22px; }
+.popup-help { color: var(--muted, #536859); font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; margin: 6px 0 10px; }
+#popup-page, #popup-checkpoint { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.popup-trail label { display: block; font-size: 14px; margin: 7px 0 5px; }
+.popup-trail select, .popup-trail input { width: 100%; min-height: 36px; border: 2px solid #36533c; border-radius: 0; background: #fffdf0; color: #24452e; font: inherit; padding: 6px; }
+.popup-actions { display: flex; gap: 8px; margin: 10px 0; }
+.popup-actions .button { flex: 1; font-size: 13px; padding: 6px; }
+.popup-trail details { border-top: 1px dashed #8c9c7e; padding-top: 8px; }
+.popup-trail summary, .popup-trends summary { cursor: pointer; font-size: 14px; }
+.popup-trail form .button { margin-top: 8px; }
+.popup-focus-row { display: flex; gap: 8px; justify-content: space-between; align-items: center; margin-top: 12px; }
+.popup-focus-row span { font-size: 14px; }
+.popup-focus-row .button { font-size: 13px; padding: 6px 8px; }
+#popup-status { padding: 7px; border: 2px solid #36533c; background: #edf1cf; font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; margin-bottom: 0; }
+.popup-trends { padding: 12px; }
+.popup-trends .chart-frame { height: 120px; }
+.popup-trends .chart-frame canvas { height: 120px; }
+.popup-open { margin: 0 3px 3px 0; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+/* Softer toolbar surfaces, with the same Daytrail palette and pixel type. */
+.toolbar-popup { padding: 14px; border-radius: 16px; background: var(--paper); }
+.popup-header { padding: 1px 2px 3px; }
+.popup-header .source-pill { border-radius: 7px; }
+.popup-trail, .popup-trends { border-radius: 12px; box-shadow: 2px 3px 0 #bcc6a8; }
+.popup-trail { padding: 15px; }
+.popup-trail .button, .popup-open { border-radius: 8px; box-shadow: 2px 2px 0 var(--sage); }
+.popup-trail select, .popup-trail input { border-radius: 7px; }
+#popup-status { border-radius: 7px; }
+.popup-trends .peak-times > div { border-radius: 7px; }
