@@ -1,3 +1,5 @@
+const hourLabel = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+const fullHourLabel = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const dayLabel = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 const fullDayLabel = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 const numbers = new Intl.NumberFormat();
@@ -14,6 +16,7 @@ export function activityChart(canvas, tooltip, announcement) {
   const pen = canvas.getContext('2d');
   const font = getComputedStyle(canvas).fontFamily;
   let timeline = [];
+  let hourly = false;
   let layout;
   let selected = -1;
 
@@ -68,7 +71,7 @@ export function activityChart(canvas, tooltip, announcement) {
       pen.textAlign = index === 0 ? 'left' : index === timeline.length - 1 ? 'right' : 'center';
       pen.textBaseline = 'top';
       pen.fillStyle = '#53665a';
-      pen.fillText(dayLabel.format(timeline[index].date), x(index), bottom + 10);
+      pen.fillText((hourly ? hourLabel : dayLabel).format(timeline[index].date), x(index), bottom + 10);
     }
 
     function trace(key) {
@@ -124,7 +127,7 @@ export function activityChart(canvas, tooltip, announcement) {
     }
 
     const date = document.createElement('strong');
-    date.textContent = fullDayLabel.format(point.date);
+    date.textContent = (hourly ? fullHourLabel : fullDayLabel).format(point.date);
     const counts = `${numbers.format(point.visits)} visits · ${numbers.format(point.searches)} searches`;
     tooltip.replaceChildren(date, document.createTextNode(counts));
     tooltip.hidden = false;
@@ -139,7 +142,7 @@ export function activityChart(canvas, tooltip, announcement) {
     draw();
     if (announce && index >= 0) {
       const point = timeline[index];
-      announcement.textContent = `${fullDayLabel.format(point.date)}, ${point.visits} visits, ${point.searches} Google searches`;
+      announcement.textContent = `${(hourly ? fullHourLabel : fullDayLabel).format(point.date)}, ${point.visits} visits, ${point.searches} Google searches`;
     }
   }
 
@@ -170,8 +173,9 @@ export function activityChart(canvas, tooltip, announcement) {
   document.fonts.ready.then(draw);
 
   return {
-    set(next) {
+    set(next, byHour = false) {
       timeline = next;
+      hourly = byHour;
       selected = -1;
       announcement.textContent = '';
       draw();

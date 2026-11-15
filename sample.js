@@ -19,7 +19,7 @@ const sites = [
 export function sampleHistory(days, now = Date.now()) {
   const summary = createSummary(days, now);
   const rhythm = [36, 52, 43, 64, 48, 28, 39, 58, 66, 47, 76, 54, 33, 40, 63, 84, 65];
-  for (let offset = 1 - days; offset <= 0; offset += 1) {
+  for (let offset = days === 1 ? -1 : 1 - days; offset <= 0; offset += 1) {
     const date = calendarDay(now, offset);
     let seed = Math.floor(date / 86400000) >>> 0;
     const random = () => {

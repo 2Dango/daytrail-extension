@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daytrail</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body class="toolbar-popup">
+  <header class="popup-header">
+    <div class="brand"><img src="icons/icon-32.png" width="24" height="24" alt="">Daytrail</div>
+    <span class="source-pill" id="popup-source" role="status">Loading…</span>
+  </header>
+  <section class="card popup-trends" aria-labelledby="popup-title">
+    <h1 id="popup-title">Last 7 days</h1>
+    <dl class="peak-times">
+      <div><dt>Web visits</dt><dd id="popup-visits">–</dd></div>
+      <div><dt>Google searches</dt><dd id="popup-searches">–</dd></div>
+      <div><dt>Most active hour</dt><dd id="popup-hour">–</dd></div>
+      <div><dt>Most active weekday</dt><dd id="popup-weekday">–</dd></div>
+    </dl>
+    <div class="chart-frame">
+      <canvas id="popup-chart" tabindex="0" role="img" aria-label="Daily visits and Google searches. Use arrow keys to inspect days."></canvas>
+      <div id="popup-tooltip" class="chart-tooltip" aria-hidden="true" hidden></div>
+      <span id="popup-announcement" class="sr-only" aria-live="polite"></span>
+    </div>
+    <ul class="legend" aria-label="Chart legend">
+      <li><i class="legend-dot visits"></i>Visits</li>
+      <li><i class="legend-dot searches"></i>Searches</li>
+    </ul>
+  </section>
+  <a class="button button-dark popup-open" href="index.html" target="_blank" rel="noopener">Open full dashboard ↗</a>
+</body>
+</html>

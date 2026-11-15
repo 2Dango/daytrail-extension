@@ -36,7 +36,7 @@ The extension uses Google’s Chrome Identity OAuth flow for name and email. Goo
 | **Tracking since** | Date of the first history approval for the current connection. The selected period can include visits from before you connected. |
 | **Favorite websites** | The five hostnames in the current date range that were visited most often. |
 
-The 7-, 30-, and 90-day filters use calendar days in your local time zone and include today. Hover over the trend chart or focus it and use the arrow keys to inspect a day. History is recalculated when you open or return to the dashboard, change the range, or click **Refresh**.
+Last 24 hours uses a rolling window with hourly buckets. The 7-, 30-, and 90-day filters use calendar days in your local time zone and include today. Hover over the trend chart or focus it and use the arrow keys to inspect a day. History is recalculated when you open or return to the dashboard, change the range, or click **Refresh**.
 
 Daytrail uses `chrome.history.search()` to find URLs and `chrome.history.getVisits()` to count individual visits. Chrome typically retains up to 90 days. The dashboard can include entries synced into this profile and excludes Incognito history and entries removed from Chrome. Account-level Google Search records found only in Google My Activity require a separate Data Portability integration. [Chrome History API](https://developer.chrome.com/docs/extensions/reference/api/history) · [Chrome history coverage](https://support.google.com/chrome/answer/95589?co=GENIE.Platform%3DDesktop) · [Google Data Portability scopes](https://developers.google.com/data-portability/user-guide/scopes)
 
@@ -66,3 +66,19 @@ For a Chrome Web Store release, ZIP the contents of the Daytrail folder with `ma
 ## Pixel design and website icons
 
 Version 1.1 adds an original canvas pixel landscape and illustrated title, responsive raised panels, keyboard-accessible chart inspection, and Chrome favicon icons. The favicon permission supplies site icons through Chrome. Icons fall back to letters if loading fails.
+
+## Toolbar popup and history management
+
+Open Daytrail from Chrome’s Extensions menu for a seven-day preview. Choose **Open full dashboard** for the complete view. Most active hour and weekday count visible visits within the displayed date range in your local time.
+
+Use **Search websites** at the top of the dashboard. Type part of a domain, use the arrow keys or click to select a match, and review its visits and active time for the dashboard range. The search includes hidden sites and sites outside the selected range. **Hide from Daytrail** excludes the site from counts, charts, and lists. Choose **Show in Daytrail** to restore it. **Delete from Chrome history** previews how many page addresses will be affected. Confirming deletes all saved visits to those addresses across all dates. Select the checkbox to also erase Daytrail’s recorded time for that site. Daytrail groups www and the bare hostname together and lists other subdomains separately.
+
+## Active time tracking
+
+Requires Chrome 120 or later. Choose **Enable time tracking** on the dashboard and approve the optional permissions. `tabs` reads the active tab’s address, `idle` detects an idle or locked device, and `alarms` periodically saves elapsed time. Daytrail treats the device as idle after 60 seconds without input. Choose **Pause time tracking** to stop collection and **Resume time tracking** to start again. Tracking begins when enabled, and the extension retains up to 90 days of measured time on this device.
+
+The time chart ranks up to eight sites and shows total measured time across all visible sites. It counts only the overlap with the selected date range. The extension saves a checkpoint about every 30 seconds and discards stale gaps after sleep or a browser restart. The most recent unsaved interval can be lost if Chrome closes unexpectedly.
+
+## Website categories
+
+Open **Website categories** at the bottom of the dashboard and paste your personal WhoisXML API key. Save it, then select a site in **Search websites** and choose **Look up category**. The first lookup asks Chrome to allow access to the provider. Daytrail sends the selected domain and key when you request a lookup and saves the result locally. Use **Remove key** to disconnect future lookups. WhoisXML API provides 500 free queries after signup. [Get a key](https://user.whoisxmlapi.com/products) · [Free access and API details](https://website-categorization.whoisxmlapi.com/api/documentation/v3/making-requests#free-access)

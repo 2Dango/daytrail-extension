@@ -1,3 +1,5 @@
+import { initTimePanel } from './time-panel.js';
+import { hourMs } from './time-data.js';
 import { calendarDay, readHistory } from './analytics.js';
 import { activityChart } from './chart.js';
 import {
@@ -5,10 +7,12 @@ import {
   historyAccess, markHistoryApproved,
 } from './auth.js';
 import { sampleHistory } from './sample.js';
+import { hiddenSites, initHistoryManager, peakLabels, placeFavicon } from './history-tools.js';
 
 const byId = (id) => document.getElementById(id);
 const numbers = new Intl.NumberFormat();
 const rangeDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+const dateTime = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const dayDate = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 const searchDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
@@ -46,19 +50,11 @@ function icon(name) {
 
 function renderFavorites(favorites) {
   const max = favorites[0]?.count ?? 1;
-  const rows = favorites.map(({ site, count }) => {
+  const rows = favorites.map(({ site, count, pageUrl }) => {
     const row = make('li', 'site-row');
-    const mark = make('span', 'site-mark', site[0].toUpperCase());
+    const mark = make('span', 'site-mark');
     mark.setAttribute('aria-hidden', 'true');
-    const favicon = document.createElement('img');
-    favicon.alt = '';
-    favicon.width = 24;
-    favicon.height = 24;
-    const faviconUrl = new URL(chrome.runtime.getURL('/_favicon/'));
-    faviconUrl.searchParams.set('pageUrl', `https://${site}/`);
-    faviconUrl.searchParams.set('size', '32');
-    favicon.addEventListener('load', () => mark.replaceChildren(favicon));
-    favicon.src = faviconUrl.href;
+    placeFavicon(mark, site, pageUrl);
     const main = make('div', 'site-details');
     const name = make('span', 'site-name', site);
     name.title = site;
@@ -92,21 +88,34 @@ function renderRecent(searches) {
   byId('recent-empty').hidden = Boolean(rows.length);
 }
 
+function displayRange(now = Date.now()) {
+  const days = Number(range.value);
+  const start = days === 1 ? now - 24 * hourMs : calendarDay(now, 1 - days);
+  return { days, start, end: now, label: (days === 1 ? dateTime : rangeDate).formatRange(start, now) };
+}
+
+const refreshTime = initTimePanel(displayRange);
+
 function renderSummary(data) {
   const now = data?.now ?? Date.now();
-  const from = data?.start ?? calendarDay(now, 1 - Number(range.value));
-  byId('date-caption').textContent = rangeDate.formatRange(from, now);
+  byId('date-caption').textContent = displayRange(now).label;
+  byId('activity-caption').textContent = Number(range.value) === 1
+    ? 'Hourly web visits and Google searches' : 'Daily web visits and Google searches';
+  refreshTime();
   byId('search-count').textContent = data ? numbers.format(data.searches) : '–';
   byId('site-count').textContent = data ? numbers.format(data.sites) : '–';
   byId('visit-count').textContent = data ? numbers.format(data.visits) : '–';
   byId('tracking-date').textContent = data?.trackingSince ? rangeDate.format(data.trackingSince) : '–';
   byId('source-pill').classList.toggle('is-live', Boolean(data && !data.sample));
   byId('source-label').textContent = data?.sample ? 'Sample data' : data ? 'Chrome history' : 'Chrome history unavailable';
-  graph.set(data?.timeline ?? []);
+  graph.set(data?.timeline ?? [], data?.hourly);
+  const { hour, weekday } = peakLabels(data);
+  byId('peak-hour').textContent = hour;
+  byId('peak-weekday').textContent = weekday;
 
   const peak = data?.timeline.reduce((best, day) => day.visits > best.visits ? day : best);
   byId('activity-summary').textContent = peak?.visits
-    ? `Busiest day · ${dayDate.format(peak.date)} · ${numbers.format(peak.visits)} visits`
+    ? `${data.hourly ? 'Busiest hour' : 'Busiest day'} · ${(data.hourly ? dateTime : dayDate).format(peak.date)} · ${numbers.format(peak.visits)} visits`
     : data ? 'No web visits in this date range.' : 'Activity could not be loaded.';
   renderFavorites(data?.favorites ?? []);
   renderRecent(data?.recent ?? []);
@@ -189,7 +198,7 @@ async function refresh({ invalidate = false } = {}) {
     }
 
     setLoading(true);
-    const result = await readHistory(chrome.history, days, { active });
+    const result = await readHistory(chrome.history, days, { active, hiddenSites: await hiddenSites() });
     if (!active()) return;
     const verified = await currentAccount();
     if (!active()) return;
@@ -324,6 +333,7 @@ chrome.permissions.onRemoved.addListener(({ permissions }) => {
   if (!accountBusy && permissions?.includes('history')) void refresh({ invalidate: true });
 });
 chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && Object.hasOwn(changes, 'hiddenSites') && historyReady) void refresh();
   if (!accountBusy && area === 'local' && Object.hasOwn(changes, 'connectedAccount')) {
     void refresh({ invalidate: true });
   }
@@ -332,6 +342,7 @@ document.addEventListener('visibilitychange', () => {
   if (!accountBusy && document.visibilityState === 'visible') void refresh();
 });
 
+initHistoryManager(refresh, displayRange);
 renderSummary(sampleHistory(Number(range.value)));
 void refresh();
 

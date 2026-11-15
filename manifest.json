@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Daytrail",
-  "version": "1.1.1",
+  "version": "1.3.1",
   "description": "See your Google searches and browsing trends from this Chrome profile.",
-  "minimum_chrome_version": "115",
+  "minimum_chrome_version": "120",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuPtQ2hbz5XcZt/4SFoe9v1NgC1Dsk5vy7PJkpqpFCEOOsG/6FFfg56Jw7+VViDSkm4kylIaHOPFMSt7G06UrMXcwWFxupwl4h5CjURyzt8XVX3Wv3p69gPQyqNuk4L5kQoywdYFzD3KOhg7tN1p/2BZw3uivhIcxR4gqDJSP+Q7x52acTIj7X/0HJ2YZ7qCmsjkuXAf5C+gSSLmrGpRMZuASWjJC7r//10r/5KTFkUbhYxpXlAlvEEAmNy3HOvHr44sS4p3UlW2zNUO5uKySj10B+2NGCeV80DguC/sw3WWB6jtnjbgaCcbKMl8AZgclU38Uuefkerr2XEcatiLLPQIDAQAB",
   "incognito": "not_allowed",
   "icons": {
@@ -13,10 +13,8 @@
     "128": "icons/icon-128.png"
   },
   "action": {
-    "default_title": "Open Daytrail"
-  },
-  "background": {
-    "service_worker": "worker.js"
+    "default_title": "Open Daytrail",
+    "default_popup": "popup.html"
   },
   "permissions": [
     "identity",
@@ -25,13 +23,16 @@
     "favicon"
   ],
   "optional_permissions": [
-    "history"
+    "history",
+    "tabs",
+    "idle",
+    "alarms"
   ],
   "host_permissions": [
     "https://openidconnect.googleapis.com/*"
   ],
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; script-src 'self'; object-src 'none'; connect-src https://openidconnect.googleapis.com; frame-ancestors 'none'; base-uri 'none'"
+    "extension_pages": "default-src 'self'; script-src 'self'; object-src 'none'; connect-src https://openidconnect.googleapis.com https://website-categorization.whoisxmlapi.com; frame-ancestors 'none'; base-uri 'none'"
   },
   "oauth2": {
     "client_id": "499681575157-nddndnisoopn0up8rlv36h02j3sg3api.apps.googleusercontent.com",
@@ -40,5 +41,12 @@
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/userinfo.profile"
     ]
-  }
+  },
+  "background": {
+    "service_worker": "worker.js",
+    "type": "module"
+  },
+  "optional_host_permissions": [
+    "https://website-categorization.whoisxmlapi.com/*"
+  ]
 }

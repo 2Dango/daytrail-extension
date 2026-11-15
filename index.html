@@ -43,6 +43,14 @@
       <canvas id="wordmark" role="img" aria-label="Daytrail"></canvas>
       <p>Your browsing, a little more explored.</p>
     </section>
+    <section class="website-search" id="website-search">
+      <label for="history-search">Search websites</label>
+      <input id="history-search" type="search" placeholder="Search by domain" autocomplete="off" spellcheck="false" aria-controls="history-results-list">
+      <div id="history-results-panel" hidden>
+        <p id="history-results" role="status"></p>
+        <ul id="history-results-list"></ul>
+      </div>
+    </section>
     <section class="overview" aria-labelledby="overview-title">
       <div>
         <h1 id="overview-title">Your activity</h1>
@@ -53,6 +61,7 @@
           <svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>
           <label for="range" class="sr-only">Date range</label>
           <select id="range">
+            <option value="1">Last 24 hours</option>
             <option value="7">Last 7 days</option>
             <option value="30" selected>Last 30 days</option>
             <option value="90">Last 90 days</option>
@@ -100,18 +109,23 @@
           <p class="metric-detail">Web visits analyzed</p>
         </article>
         <article class="metric">
-          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg></span><h2>Tracking since</h2></div>
+          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg></span><h2>History connected</h2></div>
           <p class="metric-value metric-date" id="tracking-date">–</p>
           <p class="metric-detail">First history approval</p>
         </article>
       </section>
+
+      <dl class="peak-times">
+        <div><dt>Most active hour</dt><dd id="peak-hour">–</dd></div>
+        <div><dt>Most active weekday</dt><dd id="peak-weekday">–</dd></div>
+      </dl>
 
       <div class="charts">
         <section class="card activity" aria-labelledby="activity-title">
           <header class="card-header">
             <div>
               <h2 id="activity-title">Trending activity</h2>
-              <p class="card-caption">Daily web visits and Google searches</p>
+              <p class="card-caption" id="activity-caption">Daily web visits and Google searches</p>
             </div>
             <ul class="legend" aria-label="Chart legend">
               <li><i class="legend-dot visits"></i>Visits</li>
@@ -119,8 +133,8 @@
             </ul>
           </header>
           <div class="chart-frame">
-            <canvas id="activity-chart" role="img" tabindex="0" aria-label="Daily activity chart" aria-describedby="activity-help">Daily activity chart</canvas>
-            <p id="activity-help" class="sr-only">Use the left and right arrow keys to read individual days.</p>
+            <canvas id="activity-chart" role="img" tabindex="0" aria-label="Activity chart" aria-describedby="activity-help">Activity chart</canvas>
+            <p id="activity-help" class="sr-only">Use the left and right arrow keys to read individual dates or hours.</p>
             <div id="activity-tooltip" class="chart-tooltip" aria-hidden="true" hidden></div>
             <span id="activity-announcement" class="sr-only" aria-live="polite"></span>
           </div>
@@ -130,7 +144,25 @@
           </div>
         </section>
 
-        <section class="card favorites" aria-labelledby="favorites-title">
+        <section class="card time-card" aria-labelledby="time-title">
+          <header class="card-header">
+            <div>
+              <h2 id="time-title">Time spent by website</h2>
+              <p class="card-caption" id="time-since">Time tracking is off</p>
+            </div>
+            <strong id="time-total" aria-label="Total active time">0 min</strong>
+          </header>
+          <div class="time-body">
+            <ol id="time-chart" aria-label="Websites ranked by active time"></ol>
+            <p id="time-empty">No recorded time in this date range.</p>
+            <p class="field-help">Counts time on the active website while Chrome is focused and your device is active.</p>
+            <button class="button button-outline" id="toggle-tracking" type="button">Enable time tracking</button>
+            <p id="tracking-status" role="status"></p>
+          </div>
+        </section>
+      </div>
+
+      <section class="card favorites" aria-labelledby="favorites-title">
           <header class="card-header">
             <div>
               <h2 id="favorites-title">Favorite websites</h2>
@@ -139,8 +171,7 @@
           </header>
           <ol class="site-chart" id="site-chart" aria-label="Most visited websites ranked by number of visits"></ol>
           <p class="empty-state" id="site-empty" hidden>No website visits in this date range.</p>
-        </section>
-      </div>
+      </section>
 
       <section class="card recent" aria-labelledby="recent-title">
         <header class="card-header">
@@ -156,9 +187,61 @@
 
     <footer class="page-footer">
       <span><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>History processed on this device</span>
+      <button class="text-button" id="category-settings" type="button">Website categories</button>
       <button class="text-button" id="about-control" type="button">About this data</button>
     </footer>
   </main>
+
+  <dialog id="history-dialog" aria-labelledby="history-title">
+    <header class="dialog-header">
+      <h2 id="history-title"><span id="detail-icon" class="site-mark" aria-hidden="true"></span><span id="detail-site"></span></h2>
+      <form method="dialog"><button class="icon-button" aria-label="Close website details">×</button></form>
+    </header>
+    <div class="history-controls">
+      <p id="detail-range"></p>
+      <dl class="peak-times">
+        <div><dt>Web visits</dt><dd id="detail-visits">–</dd></div>
+        <div><dt>Active time</dt><dd id="detail-time">–</dd></div>
+      </dl>
+      <section class="category-row" aria-label="Website categories">
+        <p id="detail-category" role="status"></p>
+        <button class="button button-outline" id="lookup-category" type="button">Look up category</button>
+        <p class="field-help">Lookup sends this website’s domain to WhoisXML API.</p>
+      </section>
+      <div class="history-actions">
+        <button class="button button-outline" id="hide-site" type="button" disabled>Hide from Daytrail</button>
+        <button class="button button-danger" id="delete-site" type="button" disabled>Delete from Chrome history</button>
+      </div>
+      <section id="delete-review" hidden>
+        <p id="delete-description"></p>
+        <label class="erase-option"><input type="checkbox" id="erase-time"><span>Also erase this website’s recorded active time</span></label>
+        <p class="field-help">Active time stays in Daytrail unless you choose to erase it.</p>
+        <div class="history-actions">
+          <button class="button button-outline" id="cancel-delete" type="button">Cancel</button>
+          <button class="button button-danger" id="confirm-delete" type="button">Delete every visit</button>
+        </div>
+      </section>
+      <p id="history-status" role="status"></p>
+    </div>
+  </dialog>
+
+  <dialog id="category-dialog" aria-labelledby="category-title">
+    <header class="dialog-header">
+      <h2 id="category-title">Website categories</h2>
+      <form method="dialog"><button class="icon-button" aria-label="Close category settings">×</button></form>
+    </header>
+    <form id="category-form" class="history-controls">
+      <label for="category-key">WhoisXML API key</label>
+      <input id="category-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your API key">
+      <p class="field-help">Daytrail saves the key in this Chrome profile. Each lookup sends only the selected domain and your key.</p>
+      <p><a href="https://user.whoisxmlapi.com/products" target="_blank" rel="noopener noreferrer">Get an API key from WhoisXML API</a></p>
+      <div class="history-actions">
+        <button class="button button-dark" type="submit">Save key</button>
+        <button class="button button-outline" id="remove-category-key" type="button">Remove key</button>
+      </div>
+      <p id="category-status" role="status"></p>
+    </form>
+  </dialog>
 
   <dialog id="account-dialog" aria-labelledby="account-title">
     <header class="dialog-header">
@@ -206,7 +289,7 @@
       <dd>Sites are grouped by hostname, with and without www combined. Favorites are the five sites with the most visits.</dd>
       <dt>Data processed</dt>
       <dd>The number of web visits analyzed in the selected date range, including search result visits. Reloads, subframe visits and Chrome’s generated keyword records are skipped.</dd>
-      <dt>Tracking since</dt>
+      <dt>History connected</dt>
       <dd>The first time you granted history access for this connection. The date range can include visits you made before connecting.</dd>
       <dt>Privacy and history coverage</dt>
       <dd>Google verifies your identity. Chrome grants access to the history saved in this profile. Daytrail reads it when you view the dashboard and keeps your history on this device. Only your connected account details and approval date are saved by Daytrail. Google My Activity is outside this dashboard’s history source.</dd>
