@@ -1,7 +1,8 @@
+import { overridesKey, readOverrides } from './categories.js';
 import { formatDuration, readTime, timeBySite, timeCommand, timeKey, timePermissions } from './time-data.js';
 import { hiddenSites } from './history-tools.js';
 
-export function initTimePanel(getRange) {
+export function initTimePanel(getRange, onSummary) {
   const button = document.getElementById('toggle-tracking');
   const status = document.getElementById('tracking-status');
   const list = document.getElementById('time-chart');
@@ -12,7 +13,7 @@ export function initTimePanel(getRange) {
 
   async function render() {
     const request = ++renderId;
-    const [state, hidden] = await Promise.all([readTime(), hiddenSites()]);
+    const [state, hidden, overrides] = await Promise.all([readTime(), hiddenSites(), readOverrides()]);
     if (request !== renderId) return;
     enabled = state.enabled;
     button.textContent = enabled ? 'Pause time tracking' : state.since ? 'Resume time tracking' : 'Enable time tracking';
@@ -36,6 +37,7 @@ export function initTimePanel(getRange) {
       return row;
     }));
     empty.hidden = totals.length > 0;
+    onSummary(new Map(totals), hidden, overrides);
   }
 
   function refresh() {
@@ -62,7 +64,7 @@ export function initTimePanel(getRange) {
     }
   });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes[timeKey] || changes.hiddenSites)) refresh();
+    if (area === 'local' && (changes[timeKey] || changes.hiddenSites || changes[overridesKey])) refresh();
   });
   return refresh;
 }

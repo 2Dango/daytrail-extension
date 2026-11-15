@@ -79,6 +79,8 @@ Requires Chrome 120 or later. Choose **Enable time tracking** on the dashboard a
 
 The time chart ranks up to eight sites and shows total measured time across all visible sites. It counts only the overlap with the selected date range. The extension saves a checkpoint about every 30 seconds and discards stale gaps after sleep or a browser restart. The most recent unsaved interval can be lost if Chrome closes unexpectedly.
 
-## Website categories
+## Website categories and recommendations
 
-Open **Website categories** at the bottom of the dashboard and paste your personal WhoisXML API key. Save it, then select a site in **Search websites** and choose **Look up category**. The first lookup asks Chrome to allow access to the provider. Daytrail sends the selected domain and key when you request a lookup and saves the result locally. Use **Remove key** to disconnect future lookups. WhoisXML API provides 500 free queries after signup. [Get a key](https://user.whoisxmlapi.com/products) · [Free access and API details](https://website-categorization.whoisxmlapi.com/api/documentation/v3/making-requests#free-access)
+Daytrail uses a list of known domains and a few domain suffix rules to classify sites on the device. Sites that do not match appear as **Uncategorized**. Open a site through **Search websites** and use **Change category** to label it yourself. Choose **Automatic** to restore its suggested label.
+
+The **Trending categories** chart shows each category’s share of visits or active time for the selected range. **Recommended for you** offers Chrome add-ons matched to websites you use and related websites matched to your categories. Use the selector to browse either type. Daytrail ranks suggestions using recorded time and visits. Hidden sites are excluded. No key is needed for categorization or recommendations. The update removes the saved WhoisXML API key from Daytrail’s local storage.

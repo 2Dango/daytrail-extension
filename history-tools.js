@@ -1,6 +1,6 @@
 import { describeUrl, readHistory } from './analytics.js';
 import { currentAccount, historyAccess } from './auth.js';
-import { initCategories } from './categories.js';
+import { initCategoryPicker } from './categories.js';
 import { formatDuration, readTime, timeBySite, timeCommand } from './time-data.js';
 
 const storageKey = 'hiddenSites';
@@ -78,7 +78,7 @@ async function historyBySite() {
 export function initHistoryManager(refresh, displayRange) {
   const byId = (id) => document.getElementById(id);
   const dialog = byId('history-dialog');
-  const showCategory = initCategories();
+  const showCategory = initCategoryPicker();
   const search = byId('history-search');
   const panel = byId('history-results-panel');
   const list = byId('history-results-list');

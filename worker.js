@@ -96,7 +96,14 @@ function registerTrackingListeners() {
 registerTrackingListeners();
 chrome.permissions.onAdded.addListener(registerTrackingListeners);
 chrome.runtime.onStartup.addListener(() => observe());
-chrome.runtime.onInstalled.addListener(() => observe());
+chrome.runtime.onInstalled.addListener(({ reason } = {}) => {
+  observe();
+  if (reason === 'update') {
+    void chrome.storage.local.remove('websiteCategoryApiKey').catch(() => {
+      console.error('Daytrail couldn’t remove its old category key.');
+    });
+  }
+});
 chrome.permissions.onRemoved.addListener(({ permissions }) => {
   if (timePermissions.permissions.some((permission) => permissions?.includes(permission))) observe('inactive');
 });

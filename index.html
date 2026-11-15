@@ -51,6 +51,24 @@
         <ul id="history-results-list"></ul>
       </div>
     </section>
+    <section class="card recommendation-panel" aria-labelledby="recommendation-title">
+      <header class="card-header">
+        <div>
+          <h2 id="recommendation-title">Recommended for you</h2>
+          <p class="card-caption" id="recommendation-source"></p>
+        </div>
+        <div class="insight-control">
+          <label for="recommendation-filter" class="sr-only">Recommendation type</label>
+          <select id="recommendation-filter" aria-controls="recommendation-list">
+            <option value="all">Top picks</option>
+            <option value="extension">Chrome add-ons</option>
+            <option value="site">Websites</option>
+          </select>
+        </div>
+      </header>
+      <ul id="recommendation-list"></ul>
+      <p class="empty-state" id="recommendation-empty">Visit or track websites to see recommendations.</p>
+    </section>
     <section class="overview" aria-labelledby="overview-title">
       <div>
         <h1 id="overview-title">Your activity</h1>
@@ -173,6 +191,24 @@
           <p class="empty-state" id="site-empty" hidden>No website visits in this date range.</p>
       </section>
 
+      <section class="card category-insights" aria-labelledby="category-summary-title">
+        <header class="card-header">
+          <h2 id="category-summary-title">Trending categories</h2>
+          <div class="insight-control">
+            <label for="category-metric" class="sr-only">Category chart metric</label>
+            <select id="category-metric" aria-controls="category-summary">
+              <option value="visits">Visits</option>
+              <option value="ms">Active time</option>
+            </select>
+          </div>
+        </header>
+        <div class="category-breakdown">
+          <div id="category-pie" aria-hidden="true" hidden><span id="category-pie-total"></span></div>
+          <ul class="insight-list" id="category-summary" aria-label="Category totals and shares"></ul>
+        </div>
+        <p class="empty-state" id="category-empty">No website activity in this date range.</p>
+      </section>
+
       <section class="card recent" aria-labelledby="recent-title">
         <header class="card-header">
           <div>
@@ -187,7 +223,6 @@
 
     <footer class="page-footer">
       <span><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>History processed on this device</span>
-      <button class="text-button" id="category-settings" type="button">Website categories</button>
       <button class="text-button" id="about-control" type="button">About this data</button>
     </footer>
   </main>
@@ -203,10 +238,10 @@
         <div><dt>Web visits</dt><dd id="detail-visits">–</dd></div>
         <div><dt>Active time</dt><dd id="detail-time">–</dd></div>
       </dl>
-      <section class="category-row" aria-label="Website categories">
-        <p id="detail-category" role="status"></p>
-        <button class="button button-outline" id="lookup-category" type="button">Look up category</button>
-        <p class="field-help">Lookup sends this website’s domain to WhoisXML API.</p>
+      <section class="category-row" aria-label="Website category">
+        <p id="category-detail-status" role="status"></p>
+        <label for="detail-category">Change category</label>
+        <select id="detail-category"></select>
       </section>
       <div class="history-actions">
         <button class="button button-outline" id="hide-site" type="button" disabled>Hide from Daytrail</button>
@@ -223,24 +258,6 @@
       </section>
       <p id="history-status" role="status"></p>
     </div>
-  </dialog>
-
-  <dialog id="category-dialog" aria-labelledby="category-title">
-    <header class="dialog-header">
-      <h2 id="category-title">Website categories</h2>
-      <form method="dialog"><button class="icon-button" aria-label="Close category settings">×</button></form>
-    </header>
-    <form id="category-form" class="history-controls">
-      <label for="category-key">WhoisXML API key</label>
-      <input id="category-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your API key">
-      <p class="field-help">Daytrail saves the key in this Chrome profile. Each lookup sends only the selected domain and your key.</p>
-      <p><a href="https://user.whoisxmlapi.com/products" target="_blank" rel="noopener noreferrer">Get an API key from WhoisXML API</a></p>
-      <div class="history-actions">
-        <button class="button button-dark" type="submit">Save key</button>
-        <button class="button button-outline" id="remove-category-key" type="button">Remove key</button>
-      </div>
-      <p id="category-status" role="status"></p>
-    </form>
   </dialog>
 
   <dialog id="account-dialog" aria-labelledby="account-title">

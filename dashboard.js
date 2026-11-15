@@ -1,3 +1,4 @@
+import { initRecommendations } from './recommendations.js';
 import { initTimePanel } from './time-panel.js';
 import { hourMs } from './time-data.js';
 import { calendarDay, readHistory } from './analytics.js';
@@ -94,9 +95,14 @@ function displayRange(now = Date.now()) {
   return { days, start, end: now, label: (days === 1 ? dateTime : rangeDate).formatRange(start, now) };
 }
 
-const refreshTime = initTimePanel(displayRange);
+let latestSummary;
+const renderRecommendations = initRecommendations();
+const refreshTime = initTimePanel(displayRange, (durations, hidden, overrides) => {
+  renderRecommendations(latestSummary, durations, hidden, overrides);
+});
 
 function renderSummary(data) {
+  latestSummary = data;
   const now = data?.now ?? Date.now();
   byId('date-caption').textContent = displayRange(now).label;
   byId('activity-caption').textContent = Number(range.value) === 1

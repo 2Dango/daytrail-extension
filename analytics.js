@@ -93,10 +93,10 @@ export function createSummary(days, now = Date.now()) {
       }
     },
     result() {
-      const favorites = Array.from(sites.values(), ({ site, count, pageUrl }) => ({ site, count, pageUrl }))
-        .sort((left, right) => right.count - left.count || left.site.localeCompare(right.site))
-        .slice(0, favoriteLimit);
-      return { start, now, visits, searches, sites: sites.size, timeline, favorites, recent, hours, weekdays, hourly };
+      const siteStats = Array.from(sites.values(), ({ site, count, pageUrl }) => ({ site, count, pageUrl }))
+        .sort((left, right) => right.count - left.count || left.site.localeCompare(right.site));
+      const favorites = siteStats.slice(0, favoriteLimit);
+      return { start, now, visits, searches, sites: sites.size, timeline, favorites, siteStats, recent, hours, weekdays, hourly };
     },
   };
 }
