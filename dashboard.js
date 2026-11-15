@@ -50,6 +50,15 @@ function renderFavorites(favorites) {
     const row = make('li', 'site-row');
     const mark = make('span', 'site-mark', site[0].toUpperCase());
     mark.setAttribute('aria-hidden', 'true');
+    const favicon = document.createElement('img');
+    favicon.alt = '';
+    favicon.width = 24;
+    favicon.height = 24;
+    const faviconUrl = new URL(chrome.runtime.getURL('/_favicon/'));
+    faviconUrl.searchParams.set('pageUrl', `https://${site}/`);
+    faviconUrl.searchParams.set('size', '32');
+    favicon.addEventListener('load', () => mark.replaceChildren(favicon));
+    favicon.src = faviconUrl.href;
     const main = make('div', 'site-details');
     const name = make('span', 'site-name', site);
     name.title = site;
@@ -325,3 +334,5 @@ document.addEventListener('visibilitychange', () => {
 
 renderSummary(sampleHistory(Number(range.value)));
 void refresh();
+
+import './pixel-art.js';

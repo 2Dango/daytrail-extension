@@ -167,6 +167,7 @@ export function activityChart(canvas, tooltip, announcement) {
   });
   const resizeObserver = new ResizeObserver(draw);
   resizeObserver.observe(canvas);
+  document.fonts.ready.then(draw);
 
   return {
     set(next) {

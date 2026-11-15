@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "Pixelify Sans";
+  src: url("fonts/PixelifySans.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
 :root {
   color-scheme: light;
   --bg: #f5f7f1;
@@ -8,7 +15,7 @@
   --forest: #194937;
   --green: #287050;
   --ochre: #976018;
-  --sans: "Instrument Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --sans: "Pixelify Sans", monospace;
   --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
   font: 15px/1.5 var(--sans);
   color: var(--ink);
@@ -181,3 +188,63 @@ dialog::backdrop { background: rgb(20 41 32 / 38%); }
   .connect-banner .button { margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { #report { transition: none; } }
+
+/* Daytrail's original pixel landscape and field journal layout. */
+:root { --bg:#f1ecd9; --surface:#fffcf0; --ink:#254638; --line:#a6ad8c; --forest:#315c45; --muted:#5b6851; }
+body { background-image:radial-gradient(#b8bd9a 0.6px,transparent 0.6px);background-size:8px 8px; }
+.topbar { background:#fffcf0; border-bottom:2px solid #315c45; }
+.brand { font-family:var(--sans);letter-spacing:-1px; }
+.wrap { max-width:1180px; }
+.pixel-hero { position:relative; height:245px; margin-top:24px; border:3px solid #315c45;box-shadow:5px 5px 0 #a6ad8c;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column; }
+#landscape { position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated; }
+#wordmark { position:relative;width:min(560px,85%);height:auto;image-rendering:pixelated;filter:drop-shadow(0 3px 0 #315c45);transition:transform .2s steps(4); }
+.pixel-hero:hover #wordmark { transform:translateY(-4px); }
+.pixel-hero p { position:relative;background:#fffcf0;padding:4px 12px;border:2px solid #315c45;font:14px var(--sans); }
+.overview { padding-top:27px;align-items:center; }
+h1 { font:700 28px var(--sans);letter-spacing:-1px; }
+.metric,.card,.connect-banner,dialog { border-radius:0;border:2px solid #75816a;box-shadow:4px 4px 0 #c8c9ad; }
+.metric { transition:transform .15s steps(3),box-shadow .15s; }
+.metric:hover { transform:translateY(-4px);box-shadow:4px 8px 0 #b2ba99; }
+.metric-icon,.banner-icon,.site-mark,.button,.select-wrap select,.icon-button,#setup-panel input,.avatar,.source-pill { border-radius:0; }
+.icon { stroke-linecap:square;stroke-linejoin:miter; }
+.metric-value { font-family:var(--sans);letter-spacing:-2px; }
+.metric-date { font-size:25px; }
+.card-header h2 { font-family:var(--sans);font-size:17px; }
+.connect-banner { background:#e1e9c8; }
+.button { border:2px solid #315c45;box-shadow:3px 3px 0 #a8b49a;transition:transform .12s steps(2),box-shadow .12s; }
+.button:hover { transform:translate(-1px,-2px);box-shadow:4px 5px 0 #a8b49a; }
+.button:active { transform:translate(2px,2px);box-shadow:none; }
+.charts { grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);gap:20px; }
+.card-header { border-bottom:1px dashed #c1c9ae;padding-bottom:12px; }
+.site-row { padding:6px 3px;transition:background .15s,transform .15s; }
+.site-row:hover { background:#e8edda;transform:translateX(3px); }
+.site-mark { border:1px solid #c3cbb3;background:white; }
+.site-mark img { object-fit:contain; }
+.site-track,.site-bar { border-radius:0; }
+.site-bar { background:repeating-linear-gradient(90deg,#588966 0 7px,#a9c19b 7px 9px); }
+.search-row:hover { background:#e8edda; }
+.chart-tooltip { border-radius:0;border:2px solid #b0c48e; }
+.page-footer { margin-top:8px; }
+@media(max-width:680px) {
+ .pixel-hero { height:170px;margin-top:16px; }
+ .pixel-hero p { font-size:10px; }
+ .charts { grid-template-columns:1fr;gap:14px; }
+ .metric-date { font-size:18px; }
+ h1 { font-size:24px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ *,*::before,*::after { transition:none!important;animation:none!important; }
+}
+
+/* Pixel lettering stays legible at small dashboard sizes. */
+.metric-detail, .card-caption, .legend, .site-count, .search-row time,
+.page-footer, .field-help, .dialog-status, .source-pill { font-size: 14px; }
+.date-caption, .connect-copy p, .button, .site-name, .search-row,
+.select-wrap select, .metric-label h2 { font-size: 15px; }
+.metric-value { letter-spacing: -1px; }
+@media (max-width: 680px) {
+  .metric-detail { font-size: 12px; }
+  .metric-label h2, .search-row time { font-size: 13px; }
+  .pixel-hero p { font-size: 12px; }
+}
+body { font-family: var(--sans); font-size: 15px; line-height: 1.5; }

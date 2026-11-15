@@ -62,3 +62,7 @@ For a Chrome Web Store release, ZIP the contents of the Daytrail folder with `ma
 - **Google rejects the client.** Check that the client type is **Chrome Extension**, its Item ID matches the extension ID shown in Chrome, and the Google Auth Platform project is configured for the account you’re trying to use.
 - **Daytrail asks for the same account.** Check Chrome’s profile icon. Sign into Chrome itself with the account you connect in Daytrail.
 - **You see fewer searches than expected.** Check `chrome://history` and the date filter. Daytrail counts Google Search result URLs that Chrome saved. For saved Chrome visits from other devices, enable **History and tabs** in Chrome’s Google account settings if you want to sync them. [Chrome sync settings](https://support.google.com/chrome/answer/165139)
+
+## Pixel design and website icons
+
+Version 1.1 adds an original canvas pixel landscape and illustrated title, responsive raised panels, keyboard-accessible chart inspection, and Chrome favicon icons. The favicon permission supplies site icons through Chrome. Icons fall back to letters if loading fails.
