@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daytrail · Browsing overview</title>
+  <link rel="icon" href="icons/icon-32.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="dashboard.js"></script>
+</head>
+<body>
+  <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.4 15.4 4 4"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="15" rx="2"/><path d="M8 3v6m8-6v6M4 11h16m-12 5h2m4 0h2"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 10a8 8 0 1 0-1.6 7.2M20 5v5h-5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4m-4 4v2"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-waves" viewBox="0 0 24 24"><path d="M3 17h3l4-7 4 4 5-8h2"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <img src="icons/icon-48.png" alt="" width="34" height="34">
+        <span>Daytrail</span>
+      </div>
+      <span class="source-pill" id="source-pill"><i class="status-dot"></i><span id="source-label">Sample data</span></span>
+      <button class="account-button" id="account-control" type="button" hidden>
+        <span class="avatar" id="account-initials" aria-hidden="true"></span>
+        <span class="account-text" id="account-label"></span>
+        <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="overview" aria-labelledby="overview-title">
+      <div>
+        <h1 id="overview-title">Browsing overview</h1>
+        <p class="date-caption" id="date-caption"></p>
+      </div>
+      <div class="toolbar">
+        <div class="select-wrap">
+          <svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>
+          <label for="range" class="sr-only">Date range</label>
+          <select id="range">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+          <svg class="icon select-chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+        </div>
+        <button id="refresh" class="button button-outline refresh-button" type="button" aria-label="Refresh history" title="Refresh history" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="connect-banner" id="connect-banner" aria-labelledby="connect-title">
+      <div class="connect-copy">
+        <span class="banner-icon" aria-hidden="true"><svg class="icon"><use href="#i-lock"/></svg></span>
+        <div>
+          <h2 id="connect-title">See your own browsing activity</h2>
+          <p id="connect-description">Connect your Google account, then allow access to this Chrome profile’s history.</p>
+        </div>
+      </div>
+      <button class="button button-dark" id="connect-action" type="button">
+        <span id="connect-action-label">Connect Google account</span>
+        <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </button>
+    </section>
+
+    <p id="notice" class="notice" role="status" hidden></p>
+
+    <div id="report" aria-busy="false">
+      <section class="metrics" aria-label="Activity totals">
+        <article class="metric">
+          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></span><h2>Google searches</h2></div>
+          <p class="metric-value" id="search-count">–</p>
+          <p class="metric-detail">Search result visits</p>
+        </article>
+        <article class="metric">
+          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span><h2>Unique sites</h2></div>
+          <p class="metric-value" id="site-count">–</p>
+          <p class="metric-detail">Distinct website hostnames</p>
+        </article>
+        <article class="metric">
+          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg></span><h2>Data processed</h2></div>
+          <p class="metric-value" id="visit-count">–</p>
+          <p class="metric-detail">Web visits analyzed</p>
+        </article>
+        <article class="metric">
+          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg></span><h2>Tracking since</h2></div>
+          <p class="metric-value metric-date" id="tracking-date">–</p>
+          <p class="metric-detail">First history approval</p>
+        </article>
+      </section>
+
+      <div class="charts">
+        <section class="card activity" aria-labelledby="activity-title">
+          <header class="card-header">
+            <div>
+              <h2 id="activity-title">Trending activity</h2>
+              <p class="card-caption">Daily web visits and Google searches</p>
+            </div>
+            <ul class="legend" aria-label="Chart legend">
+              <li><i class="legend-dot visits"></i>Visits</li>
+              <li><i class="legend-dot searches"></i>Searches</li>
+            </ul>
+          </header>
+          <div class="chart-frame">
+            <canvas id="activity-chart" role="img" tabindex="0" aria-label="Daily activity chart" aria-describedby="activity-help">Daily activity chart</canvas>
+            <p id="activity-help" class="sr-only">Use the left and right arrow keys to read individual days.</p>
+            <div id="activity-tooltip" class="chart-tooltip" aria-hidden="true" hidden></div>
+            <span id="activity-announcement" class="sr-only" aria-live="polite"></span>
+          </div>
+          <div class="activity-footer">
+            <svg class="icon" aria-hidden="true"><use href="#i-waves"/></svg>
+            <span id="activity-summary"></span>
+          </div>
+        </section>
+
+        <section class="card favorites" aria-labelledby="favorites-title">
+          <header class="card-header">
+            <div>
+              <h2 id="favorites-title">Favorite websites</h2>
+              <p class="card-caption">Your most visited sites</p>
+            </div>
+          </header>
+          <ol class="site-chart" id="site-chart" aria-label="Most visited websites ranked by number of visits"></ol>
+          <p class="empty-state" id="site-empty" hidden>No website visits in this date range.</p>
+        </section>
+      </div>
+
+      <section class="card recent" aria-labelledby="recent-title">
+        <header class="card-header">
+          <div>
+            <h2 id="recent-title">Recent searches</h2>
+            <p class="card-caption">Latest Google searches in this date range</p>
+          </div>
+        </header>
+        <ul id="recent-searches" class="recent-list"></ul>
+        <p id="recent-empty" class="empty-state" hidden>No Google searches in this date range.</p>
+      </section>
+    </div>
+
+    <footer class="page-footer">
+      <span><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>History processed on this device</span>
+      <button class="text-button" id="about-control" type="button">About this data</button>
+    </footer>
+  </main>
+
+  <dialog id="account-dialog" aria-labelledby="account-title">
+    <header class="dialog-header">
+      <h2 id="account-title">Google account</h2>
+      <form method="dialog"><button class="icon-button" aria-label="Close account settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form>
+    </header>
+
+    <div id="account-panel" hidden>
+      <p class="profile-name" id="profile-name"></p>
+      <p class="profile-email" id="profile-email"></p>
+      <p id="profile-history-status"></p>
+      <button class="button button-outline" id="disconnect" type="button">Disconnect Daytrail</button>
+    </div>
+
+    <div id="setup-panel" hidden>
+      <p>Set up a Google OAuth client once for this copy of the extension. Then you can connect your Google account here.</p>
+      <ol class="setup-steps">
+        <li>In Google Auth Platform, open or create a project and complete its Branding and Audience settings.</li>
+        <li>Under Clients, create a <strong>Chrome Extension</strong> client. Use the extension ID below as its Item ID. <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noreferrer">Open Google Auth Platform</a></li>
+      </ol>
+      <label for="extension-id">Extension ID</label>
+      <div class="field-row">
+        <input id="extension-id" readonly spellcheck="false" aria-label="Extension ID">
+        <button id="copy-id" class="button button-outline" type="button">Copy</button>
+      </div>
+      <form id="setup-form">
+        <label for="client-id">Google OAuth client ID</label>
+        <input id="client-id" placeholder="…apps.googleusercontent.com" autocomplete="off" spellcheck="false" required>
+        <p class="field-help">Replace the existing manifest.json in the extension folder with the downloaded file, then reload Daytrail at chrome://extensions.</p>
+        <button class="button button-dark" type="submit">Download manifest.json</button>
+      </form>
+      <p id="setup-status" class="dialog-status" role="status"></p>
+    </div>
+  </dialog>
+
+  <dialog id="about-dialog" aria-labelledby="about-title">
+    <header class="dialog-header">
+      <h2 id="about-title">About this data</h2>
+      <form method="dialog"><button class="icon-button" aria-label="Close data information"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form>
+    </header>
+    <dl class="definitions">
+      <dt>Google searches</dt>
+      <dd>Visits to Google search results with a search term. A returning visit can count again. Reloads are skipped.</dd>
+      <dt>Unique sites and favorites</dt>
+      <dd>Sites are grouped by hostname, with and without www combined. Favorites are the five sites with the most visits.</dd>
+      <dt>Data processed</dt>
+      <dd>The number of web visits analyzed in the selected date range, including search result visits. Reloads, subframe visits and Chrome’s generated keyword records are skipped.</dd>
+      <dt>Tracking since</dt>
+      <dd>The first time you granted history access for this connection. The date range can include visits you made before connecting.</dd>
+      <dt>Privacy and history coverage</dt>
+      <dd>Google verifies your identity. Chrome grants access to the history saved in this profile. Daytrail reads it when you view the dashboard and keeps your history on this device. Only your connected account details and approval date are saved by Daytrail. Google My Activity is outside this dashboard’s history source.</dd>
+    </dl>
+  </dialog>
+</body>
+</html>
