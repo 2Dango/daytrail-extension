@@ -5,15 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Daytrail</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="popup.css">
   <script type="module" src="popup.js"></script>
 </head>
 <body class="toolbar-popup">
   <header class="popup-header">
-    <div class="brand"><img src="icons/icon-32.png" width="24" height="24" alt="">Daytrail</div>
+    <div class="brand"><img src="icon-32.png" width="24" height="24" alt="">Daytrail</div>
     <span class="source-pill" id="popup-source" role="status">Loading…</span>
   </header>
-  <section class="card popup-trends" aria-labelledby="popup-title">
-    <h1 id="popup-title">Last 7 days</h1>
+  <main class="popup-body">
+  <section class="card popup-trail" aria-labelledby="popup-trail-title">
+    <h1 id="popup-trail-title">Keep your place</h1>
+    <p class="popup-help" id="popup-page">Reading this page…</p>
+    <label for="popup-trail-select">Save to a Trail</label>
+    <select id="popup-trail-select" aria-label="Active Trail"><option value="">Create a Trail first</option></select>
+    <div class="popup-actions">
+      <button class="button button-dark" type="button" id="popup-save" disabled>Save this page</button>
+      <button class="button button-outline" type="button" id="popup-resume" disabled>Resume Trail</button>
+    </div>
+    <p class="popup-help" id="popup-checkpoint" hidden></p>
+    <details id="popup-new-trail">
+      <summary>Start a new Trail</summary>
+      <form id="popup-create-form">
+        <label for="popup-trail-name">Trail name</label>
+        <input id="popup-trail-name" maxlength="120" placeholder="My next project" required>
+        <button class="button button-outline" type="submit">Create Trail</button>
+      </form>
+    </details>
+    <div class="popup-focus-row">
+      <span id="popup-focus-label">Focus is off</span>
+      <button class="button button-outline" type="button" id="popup-focus">Start focus</button>
+    </div>
+    <p class="popup-help" id="popup-focus-sites"></p>
+    <p id="popup-status" role="status" hidden></p>
+  </section>
+  <details class="card popup-trends">
+    <summary id="popup-title">Last 7 days · activity</summary>
     <dl class="peak-times">
       <div><dt>Web visits</dt><dd id="popup-visits">–</dd></div>
       <div><dt>Google searches</dt><dd id="popup-searches">–</dd></div>
@@ -29,7 +56,8 @@
       <li><i class="legend-dot visits"></i>Visits</li>
       <li><i class="legend-dot searches"></i>Searches</li>
     </ul>
-  </section>
+  </details>
+  </main>
   <a class="button button-dark popup-open" href="index.html" target="_blank" rel="noopener">Open full dashboard ↗</a>
 </body>
 </html>

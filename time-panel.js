@@ -1,8 +1,9 @@
 import { overridesKey, readOverrides } from './categories.js';
 import { formatDuration, readTime, timeBySite, timeCommand, timeKey, timePermissions } from './time-data.js';
 import { hiddenSites } from './history-tools.js';
+import { readSettings, updateSettings, matchesDomain } from './settings.js';
 
-export function initTimePanel(getRange, onSummary) {
+export function initTimePanel(getRange, onSummary, onUnavailable = () => {}) {
   const button = document.getElementById('toggle-tracking');
   const status = document.getElementById('tracking-status');
   const list = document.getElementById('time-chart');
@@ -13,7 +14,7 @@ export function initTimePanel(getRange, onSummary) {
 
   async function render() {
     const request = ++renderId;
-    const [state, hidden, overrides] = await Promise.all([readTime(), hiddenSites(), readOverrides()]);
+    const [state, hidden, overrides, settings] = await Promise.all([readTime(), hiddenSites(), readOverrides(), readSettings()]);
     if (request !== renderId) return;
     enabled = state.enabled;
     button.textContent = enabled ? 'Pause time tracking' : state.since ? 'Resume time tracking' : 'Enable time tracking';
@@ -21,7 +22,8 @@ export function initTimePanel(getRange, onSummary) {
       ? 'Tracking since ' + new Date(state.since).toLocaleDateString() + (enabled ? '' : ' · Paused')
       : 'Time tracking is off';
     const { start, end } = getRange();
-    const totals = [...timeBySite(state.sessions, start, end, hidden)].sort((a, b) => b[1] - a[1]);
+    const filter = { has: site => hidden.has(site) || settings.excludedSites.some(domain => matchesDomain(site, domain)) };
+    const totals = [...timeBySite(state.sessions, start, end, filter)].sort((a, b) => b[1] - a[1]);
     document.getElementById('time-total').textContent = formatDuration(totals.reduce((sum, [, ms]) => sum + ms, 0));
     list.replaceChildren(...totals.slice(0, 8).map(([site, ms]) => {
       const row = document.createElement('li');
@@ -37,11 +39,19 @@ export function initTimePanel(getRange, onSummary) {
       return row;
     }));
     empty.hidden = totals.length > 0;
-    onSummary(new Map(totals), hidden, overrides);
+    onSummary(new Map(totals), hidden, overrides, {
+      sessions: state.sessions.filter(([site]) => !filter.has(site)),
+      start, end, trackingEnabled: state.enabled,
+    });
   }
 
   function refresh() {
-    void render().catch(() => { status.textContent = 'Daytrail couldn’t load recorded time.'; });
+    const requested = renderId + 1;
+    void render().catch(() => {
+      if (requested !== renderId) return;
+      status.textContent = 'Daytrail couldn’t load recorded time.';
+      onUnavailable();
+    });
   }
 
   button.addEventListener('click', async () => {
@@ -54,6 +64,7 @@ export function initTimePanel(getRange, onSummary) {
         status.textContent = 'Time tracking permission was declined.';
         return;
       }
+      if (enabled) await updateSettings({ remindersEnabled: false });
       await timeCommand(enabled ? 'pause' : 'enable');
       await render();
     } catch (error) {
@@ -64,7 +75,7 @@ export function initTimePanel(getRange, onSummary) {
     }
   });
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes[timeKey] || changes.hiddenSites || changes[overridesKey])) refresh();
+    if (area === 'local' && (changes[timeKey] || changes.hiddenSites || changes[overridesKey] || changes.daytrailSettings)) refresh();
   });
   return refresh;
 }

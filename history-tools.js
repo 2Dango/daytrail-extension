@@ -1,7 +1,8 @@
 import { describeUrl, readHistory } from './analytics.js';
-import { currentAccount, historyAccess } from './auth.js';
+import { currentAccount, historyAccess, connectionKey } from './auth.js';
 import { initCategoryPicker } from './categories.js';
 import { formatDuration, readTime, timeBySite, timeCommand } from './time-data.js';
+import { readSettings, matchesDomain } from './settings.js';
 
 const storageKey = 'hiddenSites';
 
@@ -96,12 +97,13 @@ export function initHistoryManager(refresh, displayRange) {
 
   async function loadIndex() {
     const owner = await historyOwner();
-    const [sites, hidden, time] = await Promise.all([
-      owner ? historyBySite() : new Map(), hiddenSites(), readTime(),
+    const [sites, hidden, time, settings] = await Promise.all([
+      owner ? historyBySite() : new Map(), hiddenSites(), readTime(), readSettings(),
     ]);
     const verified = await historyOwner();
     if (owner !== verified) throw new Error('Your history access changed. Search again.');
-    const names = [...new Set([...sites.keys(), ...hidden, ...time.sessions.map(([site]) => site)])];
+    const names = [...new Set([...sites.keys(), ...hidden, ...time.sessions.map(([site]) => site)])]
+      .filter(site => !settings.excludedSites.some(domain => matchesDomain(site, domain)));
     names.sort((a, b) => a.localeCompare(b));
     return { owner, sites, hidden, names };
   }
@@ -237,19 +239,13 @@ export function initHistoryManager(refresh, displayRange) {
   });
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'local' || (!changes.connectedAccount && !changes.hiddenSites)) return;
+    if (area !== 'local' || (!changes[connectionKey] && !changes.hiddenSites && !changes.daytrailSettings)) return;
     index = undefined;
-    if (changes.connectedAccount) {
+    if (changes[connectionKey] || changes.daytrailSettings) {
       if (dialog.open) dialog.close();
       list.replaceChildren();
       closeResults();
     } else if (!panel.hidden) void showResults();
-  });
-  chrome.identity.onSignInChanged.addListener(() => {
-    index = undefined;
-    list.replaceChildren();
-    closeResults();
-    if (dialog.open) dialog.close();
   });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') index = undefined;

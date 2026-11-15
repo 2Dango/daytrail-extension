@@ -3,314 +3,155 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daytrail · Browsing overview</title>
-  <link rel="icon" href="icons/icon-32.png">
+  <title>Daytrail · Find your way back</title>
+  <link rel="icon" href="icon-32.png">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="dashboard.js"></script>
+  <script type="module" src="workspace.js"></script>
 </head>
-<body>
+<body class="dashboard-page">
   <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.4 15.4 4 4"/></symbol>
     <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
     <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></symbol>
-    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="15" rx="2"/><path d="M8 3v6m8-6v6M4 11h16m-12 5h2m4 0h2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="15"/><path d="M8 3v6m8-6v6M4 11h16m-12 5h2m4 0h2"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 10a8 8 0 1 0-1.6 7.2M20 5v5h-5"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
-    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4m-4 4v2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4m-4 4v2"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
     <symbol id="i-waves" viewBox="0 0 24 24"><path d="M3 17h3l4-7 4 4 5-8h2"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v10h-6v-6H9v6H3Z"/></symbol>
+    <symbol id="i-trail" viewBox="0 0 24 24"><path d="M6 21c0-4 12-4 12-9S8 8 8 3"/><circle cx="6" cy="21" r="2"/><circle cx="8" cy="3" r="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V9m6 11V4m6 16v-7m4 7H2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6Z"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   </svg>
 
-  <header class="topbar">
-    <div class="wrap topbar-inner">
-      <div class="brand">
-        <img src="icons/icon-48.png" alt="" width="34" height="34">
-        <span>Daytrail</span>
+  <aside class="sidebar" aria-label="Daytrail navigation">
+    <a class="sidebar-brand" href="#home" data-view-link="home" aria-label="Daytrail home"><img src="icon-48.png" alt="" width="40" height="40"><span>DAYTRAIL</span></a>
+    <nav class="side-nav">
+      <a href="#home" data-view-link="home"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg><span>Home</span></a>
+      <a href="#history" data-view-link="history"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span>History</span></a>
+      <a href="#trails" data-view-link="trails"><svg class="icon" aria-hidden="true"><use href="#i-trail"/></svg><span>Trails</span></a>
+      <a href="#focus" data-view-link="focus"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>Focus</span></a>
+      <a href="#insights" data-view-link="insights"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>Insights</span></a>
+      <a href="#privacy" data-view-link="privacy"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg><span>Privacy</span></a>
+    </nav>
+    <div class="sidebar-note" aria-hidden="true"><span class="pixel-sprout">✦</span><p>Leave a trail.<br>Find your way back.</p></div>
+  </aside>
+
+  <div class="app-column">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-navigation">Menu</button>
+        <div class="mobile-brand"><img src="icon-32.png" alt="" width="28" height="28"><span>Daytrail</span></div>
+        <span class="source-pill" id="source-pill"><i class="status-dot"></i><span id="source-label">Sample data</span></span>
+        <button class="account-button" id="account-control" type="button" hidden><span class="avatar" id="account-initials" aria-hidden="true"></span><span class="account-text" id="account-label"></span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></button>
       </div>
-      <span class="source-pill" id="source-pill"><i class="status-dot"></i><span id="source-label">Sample data</span></span>
-      <button class="account-button" id="account-control" type="button" hidden>
-        <span class="avatar" id="account-initials" aria-hidden="true"></span>
-        <span class="account-text" id="account-label"></span>
-        <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
-      </button>
-    </div>
-  </header>
+      <nav class="mobile-navigation" id="mobile-navigation" aria-label="Compact navigation" hidden><a href="#home" data-view-link="home">Home</a><a href="#history" data-view-link="history">History</a><a href="#trails" data-view-link="trails">Trails</a><a href="#focus" data-view-link="focus">Focus</a><a href="#insights" data-view-link="insights">Insights</a><a href="#privacy" data-view-link="privacy">Privacy</a></nav>
+    </header>
 
-  <main class="wrap">
-    <section class="pixel-hero" aria-label="Daytrail">
-      <canvas id="landscape" aria-hidden="true"></canvas>
-      <canvas id="wordmark" role="img" aria-label="Daytrail"></canvas>
-      <p>Your browsing, a little more explored.</p>
-    </section>
-    <section class="website-search" id="website-search">
-      <label for="history-search">Search websites</label>
-      <input id="history-search" type="search" placeholder="Search by domain" autocomplete="off" spellcheck="false" aria-controls="history-results-list">
-      <div id="history-results-panel" hidden>
-        <p id="history-results" role="status"></p>
-        <ul id="history-results-list"></ul>
-      </div>
-    </section>
-    <section class="card recommendation-panel" aria-labelledby="recommendation-title">
-      <header class="card-header">
-        <div>
-          <h2 id="recommendation-title">Recommended for you</h2>
-          <p class="card-caption" id="recommendation-source"></p>
-        </div>
-        <div class="insight-control">
-          <label for="recommendation-filter" class="sr-only">Recommendation type</label>
-          <select id="recommendation-filter" aria-controls="recommendation-list">
-            <option value="all">Top picks</option>
-            <option value="extension">Chrome add-ons</option>
-            <option value="site">Websites</option>
-          </select>
-        </div>
-      </header>
-      <ul id="recommendation-list"></ul>
-      <p class="empty-state" id="recommendation-empty">Visit or track websites to see recommendations.</p>
-    </section>
-    <section class="overview" aria-labelledby="overview-title">
-      <div>
-        <h1 id="overview-title">Your activity</h1>
-        <p class="date-caption" id="date-caption"></p>
-      </div>
-      <div class="toolbar">
-        <div class="select-wrap">
-          <svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg>
-          <label for="range" class="sr-only">Date range</label>
-          <select id="range">
-            <option value="1">Last 24 hours</option>
-            <option value="7">Last 7 days</option>
-            <option value="30" selected>Last 30 days</option>
-            <option value="90">Last 90 days</option>
-          </select>
-          <svg class="icon select-chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
-        </div>
-        <button id="refresh" class="button button-outline refresh-button" type="button" aria-label="Refresh history" title="Refresh history" hidden>
-          <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>
-          <span>Refresh</span>
-        </button>
-      </div>
-    </section>
-
-    <section class="connect-banner" id="connect-banner" aria-labelledby="connect-title">
-      <div class="connect-copy">
-        <span class="banner-icon" aria-hidden="true"><svg class="icon"><use href="#i-lock"/></svg></span>
-        <div>
-          <h2 id="connect-title">See your own browsing activity</h2>
-          <p id="connect-description">Connect your Google account, then allow access to this Chrome profile’s history.</p>
-        </div>
-      </div>
-      <button class="button button-dark" id="connect-action" type="button">
-        <span id="connect-action-label">Connect Google account</span>
-        <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
-      </button>
-    </section>
-
-    <p id="notice" class="notice" role="status" hidden></p>
-
-    <div id="report" aria-busy="false">
-      <section class="metrics" aria-label="Activity totals">
-        <article class="metric">
-          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></span><h2>Google searches</h2></div>
-          <p class="metric-value" id="search-count">–</p>
-          <p class="metric-detail">Search result visits</p>
-        </article>
-        <article class="metric">
-          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span><h2>Unique sites</h2></div>
-          <p class="metric-value" id="site-count">–</p>
-          <p class="metric-detail">Distinct website hostnames</p>
-        </article>
-        <article class="metric">
-          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg></span><h2>Data processed</h2></div>
-          <p class="metric-value" id="visit-count">–</p>
-          <p class="metric-detail">Web visits analyzed</p>
-        </article>
-        <article class="metric">
-          <div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg></span><h2>History connected</h2></div>
-          <p class="metric-value metric-date" id="tracking-date">–</p>
-          <p class="metric-detail">First history approval</p>
-        </article>
-      </section>
-
-      <dl class="peak-times">
-        <div><dt>Most active hour</dt><dd id="peak-hour">–</dd></div>
-        <div><dt>Most active weekday</dt><dd id="peak-weekday">–</dd></div>
-      </dl>
-
-      <div class="charts">
-        <section class="card activity" aria-labelledby="activity-title">
-          <header class="card-header">
-            <div>
-              <h2 id="activity-title">Trending activity</h2>
-              <p class="card-caption" id="activity-caption">Daily web visits and Google searches</p>
-            </div>
-            <ul class="legend" aria-label="Chart legend">
-              <li><i class="legend-dot visits"></i>Visits</li>
-              <li><i class="legend-dot searches"></i>Searches</li>
-            </ul>
-          </header>
-          <div class="chart-frame">
-            <canvas id="activity-chart" role="img" tabindex="0" aria-label="Activity chart" aria-describedby="activity-help">Activity chart</canvas>
-            <p id="activity-help" class="sr-only">Use the left and right arrow keys to read individual dates or hours.</p>
-            <div id="activity-tooltip" class="chart-tooltip" aria-hidden="true" hidden></div>
-            <span id="activity-announcement" class="sr-only" aria-live="polite"></span>
-          </div>
-          <div class="activity-footer">
-            <svg class="icon" aria-hidden="true"><use href="#i-waves"/></svg>
-            <span id="activity-summary"></span>
-          </div>
+    <main class="workspace-main">
+      <section class="workspace-view home-view" id="view-home" data-workspace-view="home" aria-labelledby="home-heading">
+        <h1 class="sr-only" id="home-heading">Daytrail home</h1>
+        <section class="pixel-hero" aria-label="Daytrail, find your way back">
+          <canvas id="landscape" aria-hidden="true"></canvas>
+          <div class="hero-title"><canvas id="wordmark" role="img" aria-label="Daytrail"></canvas><p>Your browsing, a little more explored.</p></div>
+          <span class="hero-scene-label" aria-hidden="true">THE TRAIL AHEAD</span>
         </section>
-
-        <section class="card time-card" aria-labelledby="time-title">
-          <header class="card-header">
-            <div>
-              <h2 id="time-title">Time spent by website</h2>
-              <p class="card-caption" id="time-since">Time tracking is off</p>
-            </div>
-            <strong id="time-total" aria-label="Total active time">0 min</strong>
-          </header>
-          <div class="time-body">
-            <ol id="time-chart" aria-label="Websites ranked by active time"></ol>
-            <p id="time-empty">No recorded time in this date range.</p>
-            <p class="field-help">Counts time on the active website while Chrome is focused and your device is active.</p>
-            <button class="button button-outline" id="toggle-tracking" type="button">Enable time tracking</button>
-            <p id="tracking-status" role="status"></p>
-          </div>
+        <section class="card home-discovery" id="home-discovery" aria-labelledby="home-discovery-title">
+          <header class="card-header"><div><span class="eyebrow">TRAILSIDE DISCOVERIES</span><h2 id="home-discovery-title">Useful places for your next step</h2><p class="card-caption" id="home-recommendation-source">Loading the local field guide…</p></div><button class="button button-outline" id="home-discovery-more" type="button">Browse field guide</button></header>
+          <ul id="home-recommendation-list" class="home-discovery-list"></ul>
+          <p class="empty-state" id="home-recommendation-empty">No discoveries are available with the current exclusions.</p>
         </section>
-      </div>
+        <div class="home-grid">
+          <section id="home-trail-card" class="card home-trail-card" aria-live="polite"></section>
+          <section class="card trail-guide" aria-labelledby="guide-title"><div class="card-header"><div><span class="eyebrow">QUICK START</span><h2 id="guide-title">Pick up where you left off</h2></div></div><div class="trail-guide-actions"><button class="pixel-link" type="button" data-go-view="history"><span aria-hidden="true">01</span><strong>Find a page</strong><small>Search recent history</small></button><button class="pixel-link" type="button" data-go-view="trails"><span aria-hidden="true">02</span><strong>Build a Trail</strong><small>Save links and a checkpoint</small></button><button class="pixel-link" type="button" data-go-view="focus"><span aria-hidden="true">03</span><strong>Protect time</strong><small>Start a focus session</small></button></div></section>
+        </div>
+        <section class="website-search card" id="website-search"><div><span class="eyebrow">WEBSITE TOOL</span><label for="history-search">Inspect or manage a website</label></div><input id="history-search" type="search" placeholder="Type a domain, like github.com" autocomplete="off" spellcheck="false" aria-controls="history-results-list"><div id="history-results-panel" hidden><p id="history-results" role="status"></p><ul id="history-results-list"></ul></div></section>
+      </section>
 
-      <section class="card favorites" aria-labelledby="favorites-title">
-          <header class="card-header">
-            <div>
-              <h2 id="favorites-title">Favorite websites</h2>
-              <p class="card-caption">Your most visited sites</p>
+      <section class="workspace-view" id="view-history" data-workspace-view="history" aria-labelledby="page-history-heading" hidden>
+        <header class="view-heading"><div><span class="eyebrow">PAGE MEMORY</span><h1 id="page-history-heading">Find a page you visited</h1><p>Find pages by their latest visit. Visit counts include all retained visits to that address.</p></div></header>
+        <section class="card search-workbench"><form id="page-search-form" class="page-search-form"><label class="search-field" for="page-search"><span>Search</span><input id="page-search" type="search" placeholder="Try “Chrome extension permissions”" autocomplete="off"></label><label for="page-search-days"><span>When</span><select id="page-search-days"><option value="1">Past 24 hours</option><option value="7" selected>Past 7 days</option><option value="30">Past 30 days</option><option value="90">Past 90 days</option></select></label><label for="page-search-site"><span>Website</span><input id="page-search-site" type="text" placeholder="Any website" autocomplete="off" spellcheck="false"></label><button class="button button-dark" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>Search</button></form><div class="result-heading"><p id="page-search-status" role="status">Loading recent pages…</p><span id="page-search-source" class="source-stamp"></span></div><ol id="page-search-results" class="page-results" aria-label="History search results"></ol></section>
+      </section>
+
+      <section class="workspace-view" id="view-trails" data-workspace-view="trails" aria-labelledby="trails-heading" hidden>
+        <header class="view-heading split-heading"><div><span class="eyebrow">SAVED WORKSPACES</span><h1 id="trails-heading">Your Trails</h1><p>Keep pages, notes and the next step together.</p></div><div class="form-actions"><button class="button button-outline" id="import-trail" type="button">Import JSON</button><input id="import-trail-file" type="file" accept="application/json,.json" hidden><button class="button button-dark" id="show-new-trail" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New Trail</button></div></header>
+        <p id="trail-transfer-status" class="notice" role="status" hidden></p>
+        <form id="new-trail-form" class="card compact-form" hidden><div class="card-header"><div><span class="eyebrow">NEW TRAIL</span><h2>Name what you are working on</h2></div></div><div class="form-body"><label for="new-trail-name">Trail name <input id="new-trail-name" name="name" maxlength="120" required placeholder="Build the hackathon demo"></label><label for="new-trail-goal">Goal <input id="new-trail-goal" name="goal" maxlength="500" placeholder="What does done look like?"></label><div class="form-actions"><button class="button button-dark" type="submit">Create Trail</button><button class="button button-outline" id="cancel-new-trail" type="button">Cancel</button></div><p id="new-trail-status" class="field-status" role="status"></p></div></form>
+        <div class="trails-workspace"><aside class="card trail-index" aria-label="Saved Trails"><div class="card-header"><h2>Trail map</h2><span id="trail-count" class="count-badge">0</span></div><div id="trail-list" class="trail-list"></div></aside><section id="trail-editor" class="card trail-editor" aria-live="polite"></section></div>
+      </section>
+
+      <section class="workspace-view" id="view-focus" data-workspace-view="focus" aria-labelledby="focus-heading" hidden>
+        <header class="view-heading"><div><span class="eyebrow">STAY ON THE PATH</span><h1 id="focus-heading">Focus camp</h1><p>Block chosen detours and get a nudge when a site takes too much time.</p></div></header>
+        <section id="focus-session-card" class="card focus-session-card" aria-live="polite"></section>
+        <div class="focus-grid">
+          <form id="focus-form" class="card settings-card"><div class="card-header"><div><span class="eyebrow">FOCUS SESSION</span><h2>Choose your boundary</h2></div></div><div class="form-body"><label for="focus-minutes">Session length <span><input id="focus-minutes" type="number" min="1" max="180" value="25"> minutes</span></label><label for="focus-trail">Trail to return to <select id="focus-trail"><option value="">No Trail selected</option></select></label><label for="focus-sites">Websites to block <textarea id="focus-sites" rows="4" placeholder="reddit.com&#10;instagram.com"></textarea></label><p class="field-help">One domain per line. Permissions are requested only for your chosen sites. This also saves the website list used by reminders and the toolbar.</p><button class="button button-dark" id="start-focus" type="submit">Start focus</button><p id="focus-form-status" class="field-status" role="status"></p></div></form>
+          <form id="reminder-form" class="card settings-card"><div class="card-header"><div><span class="eyebrow">GENTLE NUDGES</span><h2>Remind me to return</h2></div></div><div class="form-body"><label for="reminder-minutes">Nudge after <span><input id="reminder-minutes" type="number" min="1" max="120" value="10"> active minutes</span></label><label for="reminder-sites">Websites to watch <textarea id="reminder-sites" rows="4" placeholder="youtube.com&#10;reddit.com"></textarea></label><p class="field-help">Counts active minutes today. You can dismiss, snooze or mark a site as work. This saves the same website list used by the focus form and toolbar.</p><div class="form-actions"><button class="button button-dark" id="enable-reminders" type="submit">Enable reminders</button><button class="button button-outline" id="disable-reminders" type="button">Turn off</button></div><p id="reminder-status" class="field-status" role="status"></p></div></form>
+        </div>
+      </section>
+
+      <section class="workspace-view" id="view-privacy" data-workspace-view="privacy" aria-labelledby="privacy-heading" hidden><header class="view-heading"><div><span class="eyebrow">YOUR DATA</span><h1 id="privacy-heading">Privacy cabin</h1><p>Choose what Daytrail can read, retain and forget.</p></div></header><div id="privacy-panel"></div></section>
+
+      <section class="analytics-shell" id="analytics-shell" aria-labelledby="overview-title">
+        <header class="view-heading overview"><div><span class="eyebrow">FIELD NOTES</span><h1 id="overview-title">Your activity</h1><p class="date-caption" id="date-caption"></p></div><div class="toolbar"><div class="select-wrap"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg><label for="range" class="sr-only">Date range</label><select id="range"><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select><svg class="icon select-chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div><button id="refresh" class="button button-outline refresh-button" type="button" aria-label="Refresh history" title="Refresh history" hidden><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg><span>Refresh</span></button></div></header>
+        <section class="connect-banner" id="connect-banner" aria-labelledby="connect-title"><div class="connect-copy"><span class="banner-icon" aria-hidden="true"><svg class="icon"><use href="#i-lock"/></svg></span><div><h2 id="connect-title">See your own browsing activity</h2><p id="connect-description">Allow access to this Chrome profile’s history.</p></div></div><button class="button button-dark" id="connect-action" type="button"><span id="connect-action-label">Allow history access</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></section>
+        <p id="notice" class="notice" role="status" hidden></p>
+        <div id="report" aria-busy="false">
+          <section class="metrics" aria-label="Activity totals"><article class="metric"><div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></span><h2>Google searches</h2></div><p class="metric-value" id="search-count">–</p><p class="metric-detail">Search result visits</p></article><article class="metric"><div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span><h2>Unique sites</h2></div><p class="metric-value" id="site-count">–</p><p class="metric-detail">Distinct website hostnames</p></article><article class="metric"><div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg></span><h2>Visits analyzed</h2></div><p class="metric-value" id="visit-count">–</p><p class="metric-detail">Web visits in this range</p></article><article class="metric"><div class="metric-label"><span class="metric-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg></span><h2>History access</h2></div><p class="metric-value metric-date" id="tracking-date">–</p><p class="metric-detail">First permission date</p></article></section>
+          <dl class="peak-times"><div><dt>Most active hour</dt><dd id="peak-hour">–</dd></div><div><dt>Most active weekday</dt><dd id="peak-weekday">–</dd></div></dl>
+          <section class="card insights-detail-panel insights-only" id="insights-details" aria-labelledby="insights-details-title">
+            <header class="card-header"><div><span class="eyebrow">DETAILED FIELD REPORT</span><h2 id="insights-details-title">What the selected range actually shows</h2><p class="card-caption">Visits and measured active time are kept separate so the totals stay interpretable.</p></div><span id="insights-details-source" class="source-stamp"></span></header>
+            <p class="empty-state" id="insights-details-empty">Connect history or enable time tracking to build this report.</p>
+            <section class="measured-time-summary" aria-labelledby="insights-total-time-title">
+              <div class="measured-time-total"><span class="eyebrow" id="insights-total-time-title">TOTAL MEASURED TIME · SELECTED RANGE</span><strong id="insights-total-time">0 min</strong><p id="insights-time-state">Loading measured time…</p></div>
+              <dl><div><dt>Days with recorded time</dt><dd id="insights-recorded-days">–</dd></div><div><dt>Average per day with recorded time</dt><dd id="insights-average-time">–</dd></div><div><dt>Busiest measured day</dt><dd id="insights-busiest-time-day">–</dd></div></dl>
+            </section>
+            <div class="insights-facts" id="insights-facts"></div>
+            <div class="insight-graphs">
+              <section class="insight-graph insight-graph-wide" aria-labelledby="insights-daily-time-title"><header><h3 id="insights-daily-time-title">Daily measured active time</h3><p id="insights-daily-time-caption"></p></header><div class="pixel-column-scroll"><ol id="insights-daily-time-graph" class="pixel-column-graph" aria-label="Measured active time for each day in the selected range"></ol></div></section>
+              <section class="insight-graph insight-graph-wide" aria-labelledby="insights-hourly-visits-title"><header><h3 id="insights-hourly-visits-title">Visits by local hour</h3><p id="insights-hourly-visits-caption"></p></header><div class="pixel-column-scroll"><ol id="insights-hourly-visits-graph" class="pixel-column-graph hourly" aria-label="Website visits by local hour"></ol></div></section>
+              <section class="insight-graph" aria-labelledby="insights-visit-category-title"><header><h3 id="insights-visit-category-title">Category share by visits</h3><p>Chrome history visit counts.</p></header><ol id="insights-visit-category-graph" class="pixel-bar-graph"></ol></section>
+              <section class="insight-graph" aria-labelledby="insights-time-category-title"><header><h3 id="insights-time-category-title">Category share by measured time</h3><p>Recorded active-time intervals.</p></header><ol id="insights-time-category-graph" class="pixel-bar-graph"></ol></section>
             </div>
-          </header>
-          <ol class="site-chart" id="site-chart" aria-label="Most visited websites ranked by number of visits"></ol>
-          <p class="empty-state" id="site-empty" hidden>No website visits in this date range.</p>
-      </section>
-
-      <section class="card category-insights" aria-labelledby="category-summary-title">
-        <header class="card-header">
-          <h2 id="category-summary-title">Trending categories</h2>
-          <div class="insight-control">
-            <label for="category-metric" class="sr-only">Category chart metric</label>
-            <select id="category-metric" aria-controls="category-summary">
-              <option value="visits">Visits</option>
-              <option value="ms">Active time</option>
-            </select>
-          </div>
-        </header>
-        <div class="category-breakdown">
-          <div id="category-pie" aria-hidden="true" hidden><span id="category-pie-total"></span></div>
-          <ul class="insight-list" id="category-summary" aria-label="Category totals and shares"></ul>
-        </div>
-        <p class="empty-state" id="category-empty">No website activity in this date range.</p>
-      </section>
-
-      <section class="card recent" aria-labelledby="recent-title">
-        <header class="card-header">
-          <div>
-            <h2 id="recent-title">Recent searches</h2>
-            <p class="card-caption">Latest Google searches in this date range</p>
-          </div>
-        </header>
-        <ul id="recent-searches" class="recent-list"></ul>
-        <p id="recent-empty" class="empty-state" hidden>No Google searches in this date range.</p>
-      </section>
-    </div>
-
-    <footer class="page-footer">
-      <span><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>History processed on this device</span>
-      <button class="text-button" id="about-control" type="button">About this data</button>
-    </footer>
-  </main>
-
-  <dialog id="history-dialog" aria-labelledby="history-title">
-    <header class="dialog-header">
-      <h2 id="history-title"><span id="detail-icon" class="site-mark" aria-hidden="true"></span><span id="detail-site"></span></h2>
-      <form method="dialog"><button class="icon-button" aria-label="Close website details">×</button></form>
-    </header>
-    <div class="history-controls">
-      <p id="detail-range"></p>
-      <dl class="peak-times">
-        <div><dt>Web visits</dt><dd id="detail-visits">–</dd></div>
-        <div><dt>Active time</dt><dd id="detail-time">–</dd></div>
-      </dl>
-      <section class="category-row" aria-label="Website category">
-        <p id="category-detail-status" role="status"></p>
-        <label for="detail-category">Change category</label>
-        <select id="detail-category"></select>
-      </section>
-      <div class="history-actions">
-        <button class="button button-outline" id="hide-site" type="button" disabled>Hide from Daytrail</button>
-        <button class="button button-danger" id="delete-site" type="button" disabled>Delete from Chrome history</button>
-      </div>
-      <section id="delete-review" hidden>
-        <p id="delete-description"></p>
-        <label class="erase-option"><input type="checkbox" id="erase-time"><span>Also erase this website’s recorded active time</span></label>
-        <p class="field-help">Active time stays in Daytrail unless you choose to erase it.</p>
-        <div class="history-actions">
-          <button class="button button-outline" id="cancel-delete" type="button">Cancel</button>
-          <button class="button button-danger" id="confirm-delete" type="button">Delete every visit</button>
+            <div class="insight-rankings">
+              <section><h3>Top sites by visits</h3><ol id="insights-visit-sites"></ol></section>
+              <section><h3>Top sites by measured time</h3><ol id="insights-time-sites"></ol></section>
+              <section><h3>Top categories by visits</h3><ol id="insights-visit-categories"></ol></section>
+              <section><h3>Top categories by measured time</h3><ol id="insights-time-categories"></ol></section>
+            </div>
+            <section class="grounded-observations" aria-labelledby="observations-title"><h3 id="observations-title">Grounded observations</h3><ul id="insights-observations"></ul><p>These statements describe recorded counts. They do not judge whether a site was productive.</p></section>
+          </section>
+          <div class="charts"><section class="card activity" aria-labelledby="activity-title"><header class="card-header"><div><h2 id="activity-title">Trending activity</h2><p class="card-caption" id="activity-caption">Daily web visits and Google searches</p></div><ul class="legend" aria-label="Chart legend"><li><i class="legend-dot visits"></i>Visits</li><li><i class="legend-dot searches"></i>Searches</li></ul></header><div class="chart-frame"><canvas id="activity-chart" role="img" tabindex="0" aria-label="Activity chart" aria-describedby="activity-help">Activity chart</canvas><p id="activity-help" class="sr-only">Use the left and right arrow keys to read individual dates or hours.</p><div id="activity-tooltip" class="chart-tooltip" aria-hidden="true" hidden></div><span id="activity-announcement" class="sr-only" aria-live="polite"></span></div><div class="activity-footer"><svg class="icon" aria-hidden="true"><use href="#i-waves"/></svg><span id="activity-summary"></span></div></section><section class="card time-card" aria-labelledby="time-title"><header class="card-header"><div><h2 id="time-title">Time spent by website</h2><p class="card-caption" id="time-since">Time tracking is off</p></div><strong id="time-total" aria-label="Total active time">0 min</strong></header><div class="time-body"><ol id="time-chart" aria-label="Websites ranked by active time"></ol><p id="time-empty">No recorded time in this date range.</p><p class="field-help">Counts time on the active website while Chrome is focused and your device is active.</p><button class="button button-outline" id="toggle-tracking" type="button">Enable time tracking</button><p id="tracking-status" role="status"></p></div></section></div>
+          <section class="card favorites" aria-labelledby="favorites-title"><header class="card-header"><div><h2 id="favorites-title">Most visited websites</h2><p class="card-caption">Sites ranked by visits</p></div></header><ol class="site-chart" id="site-chart" aria-label="Most visited websites ranked by number of visits"></ol><p class="empty-state" id="site-empty" hidden>No website visits in this date range.</p></section>
+          <section class="card category-insights" aria-labelledby="category-summary-title"><header class="card-header"><h2 id="category-summary-title">Trending categories</h2><div class="insight-control"><label for="category-metric" class="sr-only">Category chart metric</label><select id="category-metric" aria-controls="category-summary"><option value="visits">Visits</option><option value="ms">Active time</option></select></div></header><div class="category-breakdown"><div id="category-pie" aria-hidden="true" hidden><span id="category-pie-total"></span></div><ul class="insight-list" id="category-summary" aria-label="Category totals and shares"></ul></div><p class="empty-state" id="category-empty">No website activity in this date range.</p></section>
+          <section class="card recent" aria-labelledby="recent-title"><header class="card-header"><div><h2 id="recent-title">Recent searches</h2><p class="card-caption">Latest Google searches in this date range</p></div></header><ul id="recent-searches" class="recent-list"></ul><p id="recent-empty" class="empty-state" hidden>No Google searches in this date range.</p></section>
+          <section class="card recommendation-panel insights-only" id="insights-discovery" aria-labelledby="recommendation-title">
+            <header class="card-header"><div><span class="eyebrow">TRAILSIDE DISCOVERIES</span><h2 id="recommendation-title">Explore the local field guide</h2><p class="card-caption" id="recommendation-source">Loading discoveries…</p></div><span id="discovery-count" class="count-badge">0 resources</span></header>
+            <div class="discovery-filters">
+              <label for="discovery-search">Search <input id="discovery-search" type="search" placeholder="Search keywords, phrases or resource names" autocomplete="off"></label>
+              <label for="recommendation-filter">View <select id="recommendation-filter"><option value="for-you">For this range</option><option value="all">Browse all</option></select></label>
+              <label for="discovery-category-filter">Category <select id="discovery-category-filter"><option value="all">All categories</option></select></label>
+              <label for="discovery-type-filter">Type <select id="discovery-type-filter"></select></label>
+              <label for="discovery-difficulty-filter">Level <select id="discovery-difficulty-filter"><option value="all">All levels</option><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></label>
+            </div>
+            <div class="discovery-preferences"><p>Suggestions are matched locally to activity, your active Trail and recent page titles.</p><button id="discovery-reset-feedback" class="text-button" type="button">Reset Useful / Not for me choices</button></div>
+            <p id="discovery-status" class="discovery-status" role="status" aria-live="polite"></p>
+            <ul id="recommendation-list" class="discovery-list"></ul>
+            <div class="discovery-more"><button id="discovery-show-all" class="button button-outline" type="button" hidden>Show 9 more</button></div>
+            <p class="empty-state" id="recommendation-empty">No field-guide resources match these filters.</p>
+          </section>
         </div>
       </section>
-      <p id="history-status" role="status"></p>
-    </div>
-  </dialog>
+      <footer class="page-footer"><span><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>History processed on this device</span><button class="text-button" id="about-control" type="button">About this data</button></footer>
+    </main>
+  </div>
 
-  <dialog id="account-dialog" aria-labelledby="account-title">
-    <header class="dialog-header">
-      <h2 id="account-title">Google account</h2>
-      <form method="dialog"><button class="icon-button" aria-label="Close account settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form>
-    </header>
-
-    <div id="account-panel" hidden>
-      <p class="profile-name" id="profile-name"></p>
-      <p class="profile-email" id="profile-email"></p>
-      <p id="profile-history-status"></p>
-      <button class="button button-outline" id="disconnect" type="button">Disconnect Daytrail</button>
-    </div>
-
-    <div id="setup-panel" hidden>
-      <p>Set up a Google OAuth client once for this copy of the extension. Then you can connect your Google account here.</p>
-      <ol class="setup-steps">
-        <li>In Google Auth Platform, open or create a project and complete its Branding and Audience settings.</li>
-        <li>Under Clients, create a <strong>Chrome Extension</strong> client. Use the extension ID below as its Item ID. <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noreferrer">Open Google Auth Platform</a></li>
-      </ol>
-      <label for="extension-id">Extension ID</label>
-      <div class="field-row">
-        <input id="extension-id" readonly spellcheck="false" aria-label="Extension ID">
-        <button id="copy-id" class="button button-outline" type="button">Copy</button>
-      </div>
-      <form id="setup-form">
-        <label for="client-id">Google OAuth client ID</label>
-        <input id="client-id" placeholder="…apps.googleusercontent.com" autocomplete="off" spellcheck="false" required>
-        <p class="field-help">Replace the existing manifest.json in the extension folder with the downloaded file, then reload Daytrail at chrome://extensions.</p>
-        <button class="button button-dark" type="submit">Download manifest.json</button>
-      </form>
-      <p id="setup-status" class="dialog-status" role="status"></p>
-    </div>
-  </dialog>
-
-  <dialog id="about-dialog" aria-labelledby="about-title">
-    <header class="dialog-header">
-      <h2 id="about-title">About this data</h2>
-      <form method="dialog"><button class="icon-button" aria-label="Close data information"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form>
-    </header>
-    <dl class="definitions">
-      <dt>Google searches</dt>
-      <dd>Visits to Google search results with a search term. A returning visit can count again. Reloads are skipped.</dd>
-      <dt>Unique sites and favorites</dt>
-      <dd>Sites are grouped by hostname, with and without www combined. Favorites are the five sites with the most visits.</dd>
-      <dt>Data processed</dt>
-      <dd>The number of web visits analyzed in the selected date range, including search result visits. Reloads, subframe visits and Chrome’s generated keyword records are skipped.</dd>
-      <dt>History connected</dt>
-      <dd>The first time you granted history access for this connection. The date range can include visits you made before connecting.</dd>
-      <dt>Privacy and history coverage</dt>
-      <dd>Google verifies your identity. Chrome grants access to the history saved in this profile. Daytrail reads it when you view the dashboard and keeps your history on this device. Only your connected account details and approval date are saved by Daytrail. Google My Activity is outside this dashboard’s history source.</dd>
-    </dl>
-  </dialog>
+  <dialog id="history-dialog" aria-labelledby="history-title"><header class="dialog-header"><h2 id="history-title"><span id="detail-icon" class="site-mark" aria-hidden="true"></span><span id="detail-site"></span></h2><form method="dialog"><button class="icon-button" aria-label="Close website details">×</button></form></header><div class="history-controls"><p id="detail-range"></p><dl class="peak-times"><div><dt>Web visits</dt><dd id="detail-visits">–</dd></div><div><dt>Active time</dt><dd id="detail-time">–</dd></div></dl><section class="category-row" aria-label="Website category"><p id="category-detail-status" role="status"></p><label for="detail-category">Change category</label><select id="detail-category"></select></section><div class="history-actions"><button class="button button-outline" id="hide-site" type="button" disabled>Hide from Daytrail</button><button class="button button-danger" id="delete-site" type="button" disabled>Delete from Chrome history</button></div><section id="delete-review" hidden><p id="delete-description"></p><label class="erase-option"><input type="checkbox" id="erase-time"><span>Also erase this website’s recorded active time</span></label><p class="field-help">Active time stays in Daytrail unless you choose to erase it.</p><div class="history-actions"><button class="button button-outline" id="cancel-delete" type="button">Cancel</button><button class="button button-danger" id="confirm-delete" type="button">Delete every visit</button></div></section><p id="history-status" role="status"></p></div></dialog>
+  <dialog id="account-dialog" aria-labelledby="account-title"><header class="dialog-header"><h2 id="account-title">Daytrail access</h2><form method="dialog"><button class="icon-button" aria-label="Close account settings"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form></header><div id="account-panel"><p class="profile-name" id="profile-name"></p><p class="profile-email" id="profile-email"></p><p id="profile-history-status"></p><button class="button button-outline" id="disconnect" type="button">Disconnect Daytrail</button></div></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><header class="dialog-header"><h2 id="about-title">About this data</h2><form method="dialog"><button class="icon-button" aria-label="Close data information"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form></header><dl class="definitions"><dt>Chrome history</dt><dd>Page addresses, saved titles and visit times from the date range you choose. Sample results are always labeled.</dd><dt>Active time</dt><dd>Approximate time on the active website while Chrome is focused and your device is active.</dd><dt>Trails</dt><dd>Pages, notes and checkpoints you deliberately save. These stay until you edit or delete the Trail.</dd><dt>Hidden and excluded sites</dt><dd>Hidden sites are left out of reports. Excluded sites are not used for future time collection or reminders.</dd><dt>Storage</dt><dd>Daytrail keeps settings, Trails and measured activity in this Chrome profile. It does not send browsing history to a Daytrail server.</dd></dl></dialog>
 </body>
 </html>

@@ -1,88 +1,113 @@
 # Daytrail
 
-Daytrail is a Chrome extension that is able to act as a multi-tool package based off your browser activity. It includes a daily activity graph, a chart of your most visited sites, and totals for searches, unique sites, and visits analyzed. It also shows recent search terms and the first date you granted access. Daytrail is able to act as both a quick and more efficient browser history dashboard that's able to change your search history and keep track, and as a fully-fledged site for analysis of activity and changes that you could make. There are also many productivity features, such as blocking websites, being able to see the different categories of sites you use, and setting up pop-ups on sites that might be acting as distractions.
+A local Chrome history extension that helps you find a page, keep your place in a project, and return to it when you get distracted. Built on the original Daytrail prototype and its cream-and-forest-green pixel design. No account, API key, paid service, server, or build step is needed.
 
-Using the trails feature, you can keep up your workflow by saving certain sites and entering focus mode, so that even after taking a break or losing your place, you can continue immediately.
+## Install
 
-## Install and connect
+1. Extract the release ZIP, or use this source folder.
+2. Open `chrome://extensions` in desktop Chrome 120 or later.
+3. Turn on **Developer mode**, choose **Load unpacked**, and select the folder containing `manifest.json`.
+4. Pin Daytrail in Chrome’s Extensions menu. Click its icon, then **Open full dashboard**.
+5. The dashboard starts with explicitly labeled sample data. Click **Allow history access** to use this Chrome profile’s history.
 
-1. Unzip Daytrail if you downloaded the ZIP folder.
-2. In the desktop Chrome profile you normally use, open `chrome://extensions`. Turn on **Developer mode**, choose **Load unpacked**, and select the **Daytrail** folder containing `manifest.json`. If you already installed this folder, click **Reload** on its extension card.
-3. Open Daytrail from Chrome’s **Extensions** menu. The dashboard opens in a new tab with labeled sample data by default.
-4. Click **Connect Google account**. Use the same account you’re signed into in Chrome. This build already includes the Google OAuth client ID.
-5. Click **Allow history access** and approve Chrome’s history permission. The dashboard will load activity saved in this Chrome profile.
+If replacing an older Daytrail folder, click **Reload** on its extension card and reopen its dashboard. Google sign-in is no longer used. Existing local time/category records are retained; old account information is removed when local history access is read.
 
-Local installation is free. [Chrome’s guide to loading an unpacked extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
+## What is included
 
-## Change the Google sign-in configuration
+- **Home:** the original pixel landscape, matching sidebar, Trailside Discoveries directly below the art, active Trail and checkpoint, plus the original activity charts.
+- **History:** find recent pages by title, URL, website and date range. Open a result or save it into a Trail. Sample results stay labeled as sample.
+- **Trails:** named projects containing selected links, a goal, notes and a next-step checkpoint. Create, edit, choose an active Trail, remove pages, resume saved pages, and delete a Trail with confirmation. JSON exports can be imported into another local copy of Daytrail.
+- **Toolbar popup:** softer rounded panels in the same pixel style; create a Trail and save the current website in one step, choose an existing Trail, resume all saved pages (up to 20), and start/end Focus. The dashboard button stays visible and the seven-day preview expands on demand. First-time Focus setup opens in the dashboard so its permission flow survives.
+- **Focus:** pick websites and a duration of 1–180 minutes. Selected domains and their subdomains redirect to a matching pixel scene during that session. The page shows your Trail/checkpoint and an explicit **End focus** button. Already-open matching tabs are redirected too.
+- **Gentle reminders:** opt in to reminders after 1–120 minutes of measured active time on selected sites during the current day. The in-page card offers **Back to my task**, **5 more minutes**, **This is work**, or dismiss. A work exception lasts until the next local day; snooze lasts five minutes. Dismissal has a ten-minute cooldown.
+- **Insights:** prominent total time spent, recorded days, average per recorded day, busiest measured day, daily active-time and hourly-visit graphs, separate category graphs, website/category rankings, shares and descriptive observations. All totals follow the selected date range and privacy filters. Trailside Discoveries includes 226 local resources across 14 categories, with search, category/type/difficulty filters, explanations and next steps. Nine cards appear initially; show nine more at a time. Sample activity stays labeled and is never mixed into measured time rankings.
+- **Privacy:** pause collection, choose 7/30/90-day time retention, exclude domains, disconnect permissions, or erase Daytrail data with confirmation.
 
-Use these steps when switching to a different Google Auth Platform project.
+## Trailside Discoveries in 2.1.0
 
-1. Sign into the **Chrome profile** with the Google account you want to connect. The Chrome profile icon is in the upper-right corner of Chrome. Check `chrome://history` in that profile to see the browsing history available for testing.
-2. Copy the extension’s ID from the Daytrail card at `chrome://extensions`. This build uses `idhilhljpjfodmnmookfohpnfmeonhpc`.
-3. Open [Google Auth Platform](https://console.cloud.google.com/auth/clients). Select or create a project and complete **Branding** and **Audience**. For a personal Google account, use an **External** audience. If you’re using a workspace with an **Internal** audience, sign in as a member of that organization.
-4. Go to **Clients → Create client → Chrome Extension**. Name the client, paste the extension ID into **Item ID**, and create it. The client ID ends in `.apps.googleusercontent.com`.
-5. In `manifest.json`, replace the value of `oauth2.client_id` with the new **client ID**. Keep the existing scopes.
-6. At `chrome://extensions`, click **Reload** on the Daytrail card. Open Daytrail again.
-7. Click **Connect Google account** and follow the Google sign-in or consent prompt. Once Daytrail shows the account, click **Allow history access** and approve Chrome’s permission separately. Refresh the dashboard after a new search if you want to check that it counts.
+The library is curated; which resources appear and their order are computed locally. Your next checkpoint carries the strongest topic weight, followed by your active Trail's name, goal and saved page titles, then permitted recent browsing titles and website/category activity. Related phrases connect terms such as **stop distracting websites** to **website blocking**. Each card explains the signal behind its match. A checkpoint about Python data visualization brings up resources such as Matplotlib and pandas; changing it to typography brings up font resources.
 
-The extension uses Google’s Chrome Identity OAuth flow for name and email. Google may reuse a previously approved sign-in, and Chrome can remember previously granted extension permissions. [Chrome’s Google OAuth setup guide](https://developer.chrome.com/docs/extensions/how-to/integrate/oauth) · [Google Auth Platform audience settings](https://support.google.com/cloud/answer/15549945)
+Use **Save to Trail** to keep a resource and its suggested next step in your active Trail. **Useful** promotes that resource and related topics; **Not for me** removes it from suggestions and library results. **Reset choices** clears those preferences. Saved and recently visited resources are labeled, and unseen resources get a small ranking boost. Browse the entire library or combine keyword, category, resource-type and difficulty filters.
 
-## What the dashboard measures
+History-title matching only runs with local history access enabled. It reads up to 200 recent pages in the selected range and uses up to 60 allowed titles for topic matching. Generic login/dashboard titles are ignored. Excluded and hidden domains are removed from matching inputs and discovery results, including saved-page title inputs. Sample page titles never count as your browsing evidence. If required privacy/context reads fail, discoveries clear and their controls stay disabled until a safe snapshot can load.
 
-| Metric | Definition |
+Resources include authored tags, related phrases, difficulty, provider links and a concrete next step. Link-check dates indicate a successful one-time HTTP reachability check, not an endorsement or a guarantee that the page is unchanged. At release, 185 links were reachable and 41 remained unverified because of access blocks, timeouts or other check failures. Opening a resource visits its external website normally; matching itself makes no network requests.
+
+## Repair notes for 2.0.1
+
+Focus requests Chrome access inside the initiating click, without the unnecessary all-tabs permission. An unanswered permission request returns control after 20 seconds; finish or dismiss Chrome’s prompt and click Start again. A late permission grant does not start a session by itself. Worker restart/lost-reply recovery avoids duplicate sessions.
+
+A website can be saved without connecting history. If no Trail exists, the Save button guides you to **Create & save page**. Chrome’s own pages and the dashboard cannot be saved; open a regular HTTP(S) website first. Resume creates every tab before switching to the first one, so closing the popup cannot interrupt the rest.
+
+Unsaved Trail drafts survive storage updates, route changes and switching between Trails in an open dashboard. Save changes to persist them across a reload; the dashboard warns before leaving with unsaved edits. Saving a page in the toolbar no longer wipes the notes you are typing.
+
+## A three-minute demo
+
+1. Open Home to show the original art and the added sidebar. Enable local history access.
+2. Create a Trail such as **Ship the hackathon demo**. Give it a goal and a checkpoint: **Polish the demo and record a walkthrough**.
+3. Search History for a page you have visited and save it. Open a regular website and use the toolbar popup to save a second page.
+4. Return to Home. The active Trail shows your checkpoint. **Resume Trail** reopens its saved pages.
+   Open Insights and try a checkpoint such as **Plot Python data with Matplotlib**, then **Choose typography for my website** to show how Discoveries changes. Save a resource or mark one Useful.
+5. In Focus, choose a harmless demo website and start a one-minute session. Open that website to show the focus scene and your checkpoint. End focus to restore access.
+6. To demonstrate a reminder, enable reminders with a one-minute threshold and browse the chosen site actively while Chrome remains focused. The tracker checks about every 30 seconds. Choose **5 more minutes** or **This is work**.
+7. Show Privacy: exclude a site, pause collection, and explain that data stays on this device.
+
+Use a separate browser profile for a public demo if you do not want to display your real history.
+
+## How the measurements work
+
+History comes from the current Chrome profile, using `chrome.history.search()` and, for the original analytics, `chrome.history.getVisits()`. It includes only entries Chrome makes available. It does not reconstruct deleted history, Incognito visits, Google My Activity, page contents, or time spent before tracking was enabled.
+
+The History view shows recent **pages**, with their latest visit time. It is not a complete chronological sequence of every visit. Search is bounded to the newest 2,000 matches per query and the UI marks truncated results. Changing the query searches Chrome again; typing does not trigger a separate visit lookup for every page. Chrome’s own matching rules apply. The analytics count individual visits, excluding reloads, subframe visits and generated keyword records. A repeated Google search results visit can count again.
+
+Active time counts a normal, non-Incognito tab while its browser window is focused and the device is active. Idle is detected after 60 seconds. Records checkpoint approximately every 30 seconds; stale gaps after sleep or restart are discarded. A recent unsaved interval can be lost on an abrupt close. The measure is an estimate of active browsing, not attention. Reminders use cumulative measured time today, rather than an uninterrupted visit timer, and do not classify a website as unproductive automatically.
+
+Hostname reports and exclusions group `www.` with the bare domain; other subdomains are separate. Exclusion and focus rules include exact domains and their subdomains, with domain boundaries respected. Focus blocking does not depend on time tracking. Stopping focus does not pause separately enabled time collection or reminders. Focus and reminders share a saved website list; starting either feature saves its selected sites for the forms and toolbar. An already-running focus session keeps its own original site list until it ends.
+
+## Permissions and local data
+
+Required permissions are `storage`, `favicon` and `activeTab`. The last permits saving the current page when you invoke the toolbar popup. Site icons use Chrome’s favicon service and fall back to letters.
+
+Optional permissions are requested when you enable their feature:
+
+| Feature | Optional access |
 | --- | --- |
-| **Google searches** | Visits to Google search results with a query in the URL. A repeat visit to a results page can count again. |
-| **Unique sites** | Distinct HTTP(S) hostnames, with `www.` and the corresponding bare hostname counted together. Other subdomains are counted separately. |
-| **Data processed** | Number of web visit records analyzed, including visits to Google search results. The dashboard skips page reloads, subframe visits, and generated keyword records. |
-| **Tracking since** | Date of the first history approval for the current connection. The selected period can include visits from before you connected. |
-| **Favorite websites** | The five hostnames in the current date range that were visited most often. |
+| History and its management tools | `history` |
+| Active-time collection | `tabs`, `idle`, `alarms` |
+| Timed website blocking | `declarativeNetRequestWithHostAccess`, `alarms`, and the selected websites |
+| In-page reminders | `scripting`, `tabs`, `idle`, `alarms`, and the selected websites |
 
-Last 24 hours uses a rolling window with hourly buckets. The 7-, 30-, and 90-day filters use calendar days in your local time zone and include today. Hover over the trend chart or focus it and use the arrow keys to inspect a day. History is recalculated when you open or return to the dashboard, change the range, or click **Refresh**.
+The manifest allows requesting HTTP(S) hosts, but feature prompts request only the domains you select, including their subdomains. No remote code, telemetry, AI calls or history uploads are used. All fonts and scripts ship with the extension.
 
-Daytrail uses `chrome.history.search()` to find URLs and `chrome.history.getVisits()` to count individual visits. Chrome typically retains up to 90 days. The dashboard can include entries synced into this profile and excludes Incognito history and entries removed from Chrome. Account-level Google Search records found only in Google My Activity require a separate Data Portability integration. [Chrome History API](https://developer.chrome.com/docs/extensions/reference/api/history) · [Chrome history coverage](https://support.google.com/chrome/answer/95589?co=GENIE.Platform%3DDesktop) · [Google Data Portability scopes](https://developers.google.com/data-portability/user-guide/scopes)
+Stored locally: chosen Trail page URLs/titles and notes, checkpoints, active-time intervals, focus sessions, reminder snoozes/work exceptions, hidden/excluded sites, category overrides, preferences, the IDs of discovery resources marked Useful or Not for me, and the history-permission approval date. Search/chart results and discovery title-matching context are cached temporarily in the open page's memory. No browsing-topic profile is stored. Page bodies, screenshots, passwords and form inputs are not collected. A Trail export deliberately contains its selected links and notes; review it before sharing.
 
-## Permissions and privacy
+- **Hide from Daytrail** filters reports. It does not stop time collection or erase browser history.
+- **Exclude website** removes it and its subdomains from history views, time collection and reminders, and removes its recorded time. It does not remove intentionally saved Trail links or Chrome history. Focus blocking remains controlled by its own chosen list.
+- **Pause time collection** in Privacy stops time collection and reminders. Existing records remain.
+- **Disconnect and pause Daytrail** ends focus, pauses collection/reminders and removes optional permissions. Saved Trails and records remain.
+- **Erase Daytrail data** confirms before removing all local Trails, time records and preferences. It leaves Chrome history untouched.
+- **Delete from Chrome history** in Home’s website manager is a separate, destructive action with a preview and confirmation. It removes every Chrome visit to the listed page addresses across all dates. You may separately choose to erase recorded time for that site.
 
-- `identity` opens Google’s sign-in or consent flow. The extension uses an access token to get the account’s basic details from Google’s OpenID Connect user info endpoint. It does not store the token in extension storage.
-- `identity.email` checks that the connected Google account matches the one signed into the Chrome profile. This permission allows Chrome to display an email-access warning during installation.
-- `history` is optional until you click **Allow history access**. Chrome’s approval wording includes the ability to change history. Daytrail only reads it.
-- `storage` saves the connected account information and first approval date locally. Searches, URLs, and chart data are calculated in the open dashboard and stay on the device. Opening the dashboard without a matching Chrome profile shows sample data.
-- **Disconnect Daytrail** clears the connection in the extension, removes its history permission, and clears Chrome’s cached OAuth tokens for Daytrail. You can manage the Google OAuth grant in [Google Account connections](https://myaccount.google.com/connections).
+## Deliberate limits
 
-[Chrome Identity API](https://developer.chrome.com/docs/extensions/reference/api/identity) · [Optional permission prompts](https://developer.chrome.com/docs/extensions/reference/api/permissions#method-request)
+This is an unpacked hackathon build, not a published Chrome Web Store release. Blocking is a focus aid: you can end the session, remove permissions or disable the extension. Chrome can delay alarms during sleep; expired sessions reconcile when the worker resumes. Restricted browser pages such as `chrome://` cannot show reminders. Site scripts, browser policy or permission revocation can also prevent injection. The build supports up to 100 Trails, 100 saved pages per Trail, and opens at most 20 saved pages per resume action.
 
-## Working with a teammate
+Explicitly saved Trails remain until you delete them; the retention setting applies to measured active-time records. Discoveries use a fixed local catalog with keyword and related-phrase matching. Descriptions and next steps are authored, so this is not live search or generated advice; unfamiliar topics may have no direct match. There is no cloud sync, account integration, semantic/AI search, automatic page summarization, or historical page-body archive.
 
-Put the Daytrail folder in a shared GitHub repository. There’s no build step or dependency installation. Keep the public manifest key unchanged so everyone’s local copy uses the same extension ID. A team can share the Google OAuth **client ID** for that extension ID. Keep client secrets, tokens, and real history exports out of the repo.
+## Development and verification
 
-For a Chrome Web Store release, ZIP the contents of the Daytrail folder with `manifest.json` at the root of the archive. Create a draft in the Developer Dashboard and use the draft’s **Package → View public key** value as the development manifest key. Set up a production OAuth client for the resulting Store Item ID and test with that ID before submitting. The Chrome Web Store requires its own registration and review, including for unlisted releases. A history extension also needs a published privacy policy and disclosures in the listing. [Consistent extension IDs](https://developer.chrome.com/docs/extensions/reference/manifest/key) · [Store privacy requirements](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq)
+The extension runs directly from these files. Node 20+ is only needed to run development tests:
 
-## Troubleshooting
+```sh
+npm test
+```
 
-- **Connect opens the setup dialog again.** Confirm that the replacement manifest contains `oauth2.client_id` and that you reloaded the same folder.
-- **Google rejects the client.** Check that the client type is **Chrome Extension**, its Item ID matches the extension ID shown in Chrome, and the Google Auth Platform project is configured for the account you’re trying to use.
-- **Daytrail asks for the same account.** Check Chrome’s profile icon. Sign into Chrome itself with the account you connect in Daytrail.
-- **You see fewer searches than expected.** Check `chrome://history` and the date filter. Daytrail counts Google Search result URLs that Chrome saved. For saved Chrome visits from other devices, enable **History and tabs** in Chrome’s Google account settings if you want to sync them. [Chrome sync settings](https://support.google.com/chrome/answer/165139)
+`npm run test:browser` runs the isolated Chromium verification and writes its evidence outside the extension. Install Playwright and its Chromium browser for this optional development check. `DAYTRAIL_PLAYWRIGHT_MODULE` can specify a local Playwright module, and `PLAYWRIGHT_BROWSERS_PATH` can specify its browser cache. The deterministic tests use controlled Chrome fixtures.
 
-## Pixel design and website icons
+Verification for the discovery update is recorded in `artifacts/discoveries-2.1.0/VERIFICATION.md` in the source checkout; earlier repair evidence remains in `artifacts/repair-2.0.1`. `npm run test:discoveries` covers matching from actual visited fixture titles, active-Trail changes, filters, pagination, save/deduplication, feedback/reset and privacy failures. `npm run test:native` exercises the actual Chrome toolbar action and `activeTab`, using a separate profile; `DAYTRAIL_CHROME` selects a Chrome executable supporting the DevTools Extensions domain. `npm run test:extra` covers additional History and Privacy flows. No personal browser profile is used.
 
-Version 1.1 adds an original canvas pixel landscape and illustrated title, responsive raised panels, keyboard-accessible chart inspection, and Chrome favicon icons. The favicon permission supplies site icons through Chrome. Icons fall back to letters if loading fails.
+The native suite tests create/save/select/deduplicate/reopen/resume, drafts, import/export/delete, popup dimensions, Discoveries filters, and Focus's pending-permission recovery against the unchanged production manifest. Other browser checks exercise actual history, DNR, alarms and reminder injection using optional permissions promoted to required **only in a disposable test copy**. Expiry and reminder time are accelerated with seeded test state.
 
-## Toolbar popup and history management
+Chrome’s native permission Allow/Cancel widgets are not exposed by this automation environment. Their visual interaction and full selected-site permission revocation still need a manual check in a fresh profile. Deterministic tests cover denial, late grant, missing access, retry and disconnect ordering; the exact-manifest native test verifies that an unanswered request no longer leaves the button stuck. These are distinct from having clicked Chrome’s native Allow button.
 
-Open Daytrail from Chrome’s Extensions menu for a seven-day preview. Choose **Open full dashboard** for the complete view. Most active hour and weekday count visible visits within the displayed date range in your local time.
-
-Use **Search websites** at the top of the dashboard. Type part of a domain, use the arrow keys or click to select a match, and review its visits and active time for the dashboard range. The search includes hidden sites and sites outside the selected range. **Hide from Daytrail** excludes the site from counts, charts, and lists. Choose **Show in Daytrail** to restore it. **Delete from Chrome history** previews how many page addresses will be affected. Confirming deletes all saved visits to those addresses across all dates. Select the checkbox to also erase Daytrail’s recorded time for that site. Daytrail groups www and the bare hostname together and lists other subdomains separately.
-
-## Active time tracking
-
-Requires Chrome 120 or later. Choose **Enable time tracking** on the dashboard and approve the optional permissions. `tabs` reads the active tab’s address, `idle` detects an idle or locked device, and `alarms` periodically saves elapsed time. Daytrail treats the device as idle after 60 seconds without input. Choose **Pause time tracking** to stop collection and **Resume time tracking** to start again. Tracking begins when enabled, and the extension retains up to 90 days of measured time on this device.
-
-The time chart ranks up to eight sites and shows total measured time across all visible sites. It counts only the overlap with the selected date range. The extension saves a checkpoint about every 30 seconds and discards stale gaps after sleep or a browser restart. The most recent unsaved interval can be lost if Chrome closes unexpectedly.
-
-## Website categories and recommendations
-
-Daytrail uses a list of known domains and a few domain suffix rules to classify sites on the device. Sites that do not match appear as **Uncategorized**. Open a site through **Search websites** and use **Change category** to label it yourself. Choose **Automatic** to restore its suggested label.
-
-The **Trending categories** chart shows each category’s share of visits or active time for the selected range. **Recommended for you** offers Chrome add-ons matched to websites you use and related websites matched to your categories. Use the selector to browse either type. Daytrail ranks suggestions using recorded time and visits. Hidden sites are excluded. No key is needed for categorization or recommendations. The update removes the saved WhoisXML API key from Daytrail’s local storage.
+Original prototype: [2Dango/g-extension-](https://github.com/2Dango/g-extension-) at `0aebe9138b40cfb777120dda7eaaae800adff8c7`. The included Pixelify Sans font retains its `OFL.txt` license. The original art and interface were extended in canvas and CSS.

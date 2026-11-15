@@ -1,4 +1,25 @@
 import { hourMs } from './time-data.js';
+import { readSettings, matchesDomain } from './settings.js';
+
+const visitCache = new Map();
+let visitCacheGeneration = 0;
+export function invalidateVisitCache(url) {
+  visitCacheGeneration += 1;
+  if (url) visitCache.delete(url);
+  else visitCache.clear();
+}
+
+async function visitsFor(history, url) {
+  const cached = visitCache.get(url);
+  if (cached && Date.now() - cached.at < 15_000) return cached.visits;
+  const generation = visitCacheGeneration;
+  const visits = await history.getVisits({ url });
+  if (generation === visitCacheGeneration && visits.length <= 2000) {
+    if (visitCache.size >= 500) visitCache.delete(visitCache.keys().next().value);
+    visitCache.set(url, { at: Date.now(), visits });
+  }
+  return visits;
+}
 
 // Country domains from https://www.google.com/supported_domains.
 const googleSuffixes = new Set(`
@@ -103,6 +124,7 @@ export function createSummary(days, now = Date.now()) {
 
 export async function readHistory(history, days, { now = Date.now(), active = () => true, hiddenSites = new Set(), urls: selectedUrls } = {}) {
   const summary = createSummary(days, now);
+  const settings = await readSettings();
   // Chrome uses 0 as the uncapped result count. getVisits supplies the individual timestamps.
   const entries = selectedUrls ? null : await history.search({ text: '', startTime: summary.start, endTime: now + 1, maxResults: 0 });
   const urls = Array.from(new Set(selectedUrls ?? entries.map(({ url }) => url)));
@@ -113,10 +135,10 @@ export async function readHistory(history, days, { now = Date.now(), active = ()
     while (!failed && active() && next < urls.length) {
       const url = urls[next++];
       const website = describeUrl(url);
-      if (!website || hiddenSites.has(website.site)) continue;
+      if (!website || hiddenSites.has(website.site) || settings.excludedSites.some(domain => matchesDomain(website.site, domain))) continue;
 
       try {
-        const visits = await history.getVisits({ url });
+        const visits = await visitsFor(history, url);
         if (!active() || failed) return;
         for (const visit of visits) {
           summary.add(website, visit.visitTime, visit.transition);

@@ -10,7 +10,7 @@ const catalog = {
   'Entertainment': ['youtube.com', 'youtu.be', 'netflix.com', 'spotify.com', 'twitch.tv', 'steampowered.com', 'letterboxd.com', 'bandcamp.com', 'music.apple.com'],
   'Books': ['goodreads.com', 'openlibrary.org', 'gutenberg.org', 'storygraph.com', 'thestorygraph.com'],
   'Maps, travel & outdoors': ['alltrails.com', 'openstreetmap.org', 'booking.com', 'airbnb.com', 'maps.google.com', 'wikivoyage.org', 'weather.gc.ca'],
-  'Work & communication': ['mail.google.com', 'docs.google.com', 'drive.google.com', 'calendar.google.com', 'outlook.com', 'slack.com', 'notion.so', 'trello.com', 'zoom.us'],
+  'Work & communication': ['mail.google.com', 'docs.google.com', 'drive.google.com', 'calendar.google.com', 'outlook.com', 'slack.com', 'notion.so', 'notion.com', 'trello.com', 'zoom.us'],
   'Shopping': ['amazon.com', 'amazon.ca', 'ebay.com', 'etsy.com', 'walmart.com', 'walmart.ca', 'bestbuy.ca'],
   'Finance & markets': ['polymarket.com', 'kalshi.com', 'tradingview.com', 'finance.yahoo.com', 'coinbase.com', 'wealthsimple.com'],
   'Government': ['canada.ca', 'ontario.ca', 'toronto.ca', 'gc.ca', 'gov.uk'],

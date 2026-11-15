@@ -1,14 +1,16 @@
 import { initRecommendations } from './recommendations.js';
+import { initDetailedInsights } from './insights.js';
 import { initTimePanel } from './time-panel.js';
 import { hourMs } from './time-data.js';
-import { calendarDay, readHistory } from './analytics.js';
+import { calendarDay, readHistory, invalidateVisitCache } from './analytics.js';
 import { activityChart } from './chart.js';
-import {
-  configureManifest, connectGoogle, currentAccount, disconnectGoogle, googleConfigured,
-  historyAccess, markHistoryApproved,
-} from './auth.js';
+import { connectHistory, currentAccount, disconnectDaytrail, historyAccess, connectionKey } from './auth.js';
+import { initPrivacyPanel } from './privacy-panel.js';
 import { sampleHistory } from './sample.js';
 import { hiddenSites, initHistoryManager, peakLabels, placeFavicon } from './history-tools.js';
+import { loadDiscoveryContext } from './discovery-context.js';
+import { discoveryFeedbackKey } from './discovery-state.js';
+import { trailsKey, activeTrailKey } from './trails.js';
 
 const byId = (id) => document.getElementById(id);
 const numbers = new Intl.NumberFormat();
@@ -97,9 +99,30 @@ function displayRange(now = Date.now()) {
 
 let latestSummary;
 const renderRecommendations = initRecommendations();
-const refreshTime = initTimePanel(displayRange, (durations, hidden, overrides) => {
-  renderRecommendations(latestSummary, durations, hidden, overrides);
-});
+const renderDetailedInsights = initDetailedInsights();
+let insightVersion = 0;
+function invalidateDiscoveries(pending = false) {
+  insightVersion += 1;
+  renderRecommendations(null, new Map(), null, {}, { pending });
+}
+const refreshTime = initTimePanel(displayRange, (durations, hidden, overrides, timeContext) => {
+  const requested = ++insightVersion;
+  const summary = latestSummary;
+  // Clear stale matches while loading a new privacy/context snapshot. Delayed
+  // reads must not repaint results after a Trail, permission or exclusion change.
+  renderRecommendations(null, new Map(), null, {}, { pending: true });
+  void loadDiscoveryContext({
+    ...displayRange(), hidden, includeHistory: Boolean(historyReady && summary && !summary.sample),
+  }).then(({ excluded, details }) => {
+    if (requested !== insightVersion) return;
+    renderRecommendations(summary, durations, excluded, overrides, details);
+    renderDetailedInsights(summary, durations, overrides, timeContext);
+  }).catch(() => {
+    if (requested !== insightVersion) return;
+    renderRecommendations(summary, durations, null, overrides);
+    renderDetailedInsights(summary, durations, overrides, timeContext);
+  });
+}, invalidateDiscoveries);
 
 function renderSummary(data) {
   latestSummary = data;
@@ -111,7 +134,8 @@ function renderSummary(data) {
   byId('search-count').textContent = data ? numbers.format(data.searches) : '–';
   byId('site-count').textContent = data ? numbers.format(data.sites) : '–';
   byId('visit-count').textContent = data ? numbers.format(data.visits) : '–';
-  byId('tracking-date').textContent = data?.trackingSince ? rangeDate.format(data.trackingSince) : '–';
+  byId('tracking-date').textContent = data?.sample ? 'Off' : data?.trackingSince ? rangeDate.format(data.trackingSince) : '–';
+  document.querySelector('#tracking-date + .metric-detail').textContent = data?.sample ? 'Sample activity shown' : 'First permission date';
   byId('source-pill').classList.toggle('is-live', Boolean(data && !data.sample));
   byId('source-label').textContent = data?.sample ? 'Sample data' : data ? 'Chrome history' : 'Chrome history unavailable';
   graph.set(data?.timeline ?? [], data?.hourly);
@@ -137,32 +161,18 @@ function renderSummary(data) {
 function renderAccess() {
   byId('connect-banner').hidden = historyReady;
   refreshButton.hidden = !historyReady;
-  accountButton.hidden = !account;
-  byId('connect-title').textContent = account ? 'Allow Chrome history access' : 'See your own browsing activity';
-  byId('connect-description').textContent = account
-    ? `Signed in as ${account.email}. Chrome uses a separate permission for this profile’s history.`
-    : 'Connect your Google account, then allow access to this Chrome profile’s history.';
-  byId('connect-action-label').textContent = account ? 'Allow history access' : 'Connect Google account';
-  if (!account) {
-    if (accountDialog.open && !byId('account-panel').hidden) accountDialog.close();
-    byId('profile-name').textContent = '';
-    byId('profile-email').textContent = '';
-    byId('account-label').textContent = '';
-    byId('account-initials').textContent = '';
-    accountButton.removeAttribute('aria-label');
-    return;
-  }
-
-  const identity = account.name || account.email;
-  byId('account-label').textContent = identity;
-  byId('account-initials').textContent = identity.split(/\s+/).slice(0, 2)
-    .map((part) => Array.from(part)[0]).join('').toLocaleUpperCase();
-  accountButton.setAttribute('aria-label', `Manage Google account, ${account.email}`);
-  byId('profile-name').textContent = account.name;
-  byId('profile-email').textContent = account.email;
+  accountButton.hidden = false;
+  byId('connect-title').textContent = 'Explore your own browsing';
+  byId('connect-description').textContent = 'Allow access to this Chrome profile’s history. Everything stays on this device.';
+  byId('connect-action-label').textContent = 'Allow history access';
+  byId('account-label').textContent = 'Privacy';
+  byId('account-initials').textContent = 'P';
+  accountButton.setAttribute('aria-label', 'Open privacy and data controls');
+  byId('profile-name').textContent = 'This Chrome profile';
+  byId('profile-email').textContent = 'No Google account or cloud connection required.';
   byId('profile-history-status').textContent = historyReady
-    ? 'This profile has granted Chrome history access.'
-    : 'Waiting for history approval from Chrome.';
+    ? 'History access is enabled. Recorded time, saved Trails and settings stay on this device.'
+    : 'History access is off. The dashboard is showing labeled sample data.';
 }
 
 function showNotice(message = '') {
@@ -243,88 +253,26 @@ async function accountAction(label, action, failure) {
   }
 }
 
-function openSetup() {
-  byId('account-title').textContent = 'Set up Google sign-in';
-  byId('account-panel').hidden = true;
-  byId('setup-panel').hidden = false;
-  byId('extension-id').value = chrome.runtime.id;
-  byId('setup-status').textContent = '';
-  accountDialog.showModal();
-}
-
 accountButton.addEventListener('click', () => {
-  byId('account-title').textContent = 'Google account';
-  byId('setup-panel').hidden = true;
-  byId('account-panel').hidden = false;
-  accountDialog.showModal();
+  document.dispatchEvent(new CustomEvent('daytrail:navigate', { detail: { view: 'privacy' } }));
 });
 byId('about-control').addEventListener('click', () => byId('about-dialog').showModal());
 
 connectButton.addEventListener('click', () => {
-  if (account) {
-    const { profileId } = account;
-    void accountAction('Waiting for Chrome…', async () => {
-      if (await chrome.permissions.request(historyAccess)) {
-        await markHistoryApproved(profileId);
-      } else {
-        showNotice('History access was declined. You can keep exploring the sample data.');
-      }
-    });
-  } else if (googleConfigured) {
-    void accountAction('Connecting…', connectGoogle, (error) => {
-      if (/not granted|cancel|closed|denied|rejected/i.test(error.message ?? '')) {
-        return 'Google sign-in was interrupted. You can try again.';
-      }
-      if (/oauth2|invalid.client|bad client/i.test(error.message ?? '')) {
-        return 'Google couldn’t use this OAuth client. Check that its Item ID matches this extension and try again.';
-      }
-      return '';
-    });
-  } else {
-    openSetup();
-  }
+  const request = connectHistory();
+  void accountAction('Waiting for Chrome…', async () => {
+    if (!await request) showNotice('History permission was declined. You can still explore the sample data.');
+  });
 });
 
 disconnectButton.addEventListener('click', () => {
   accountDialog.close();
-  version += 1;
-  resetToSample();
-  void accountAction('Disconnecting…', disconnectGoogle);
-});
-
-byId('copy-id').addEventListener('click', async () => {
-  const field = byId('extension-id');
-  try {
-    await navigator.clipboard.writeText(field.value);
-    byId('setup-status').textContent = 'Extension ID copied.';
-  } catch {
-    field.select();
-    byId('setup-status').textContent = 'Copy the selected extension ID.';
-  }
-});
-
-byId('setup-form').addEventListener('submit', (event) => {
-  event.preventDefault();
-  const status = byId('setup-status');
-  try {
-    const manifest = configureManifest(byId('client-id').value.trim());
-    const file = new Blob([JSON.stringify(manifest, null, 2) + '\n'], { type: 'application/json' });
-    const url = URL.createObjectURL(file);
-    const link = make('a');
-    link.href = url;
-    link.download = 'manifest.json';
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    status.textContent = 'Check your Chrome downloads for manifest.json.';
-  } catch (error) {
-    status.textContent = error.message;
-  }
+  void accountAction('Disconnecting…', disconnectDaytrail);
 });
 
 range.addEventListener('change', () => {
   showNotice();
+  invalidateDiscoveries(true);
   void refresh();
 });
 refreshButton.addEventListener('click', () => {
@@ -332,15 +280,20 @@ refreshButton.addEventListener('click', () => {
   void refresh();
 });
 
-chrome.identity.onSignInChanged.addListener(() => {
-  if (!accountBusy) void refresh({ invalidate: true });
-});
 chrome.permissions.onRemoved.addListener(({ permissions }) => {
-  if (!accountBusy && permissions?.includes('history')) void refresh({ invalidate: true });
+  if (permissions?.includes('history')) {
+    invalidateDiscoveries(true);
+    invalidateVisitCache();
+    if (!accountBusy) void refresh({ invalidate: true });
+  }
 });
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && Object.hasOwn(changes, 'hiddenSites') && historyReady) void refresh();
-  if (!accountBusy && area === 'local' && Object.hasOwn(changes, 'connectedAccount')) {
+  if (area === 'local' && [trailsKey, activeTrailKey, discoveryFeedbackKey, 'hiddenSites', 'daytrailSettings', connectionKey].some(key => Object.hasOwn(changes, key))) {
+    invalidateDiscoveries(true);
+    refreshTime();
+  }
+  if (area === 'local' && (Object.hasOwn(changes, 'hiddenSites') || Object.hasOwn(changes, 'daytrailSettings')) && historyReady) void refresh();
+  if (!accountBusy && area === 'local' && Object.hasOwn(changes, connectionKey)) {
     void refresh({ invalidate: true });
   }
 });
@@ -348,6 +301,25 @@ document.addEventListener('visibilitychange', () => {
   if (!accountBusy && document.visibilityState === 'visible') void refresh();
 });
 
+chrome.permissions.onAdded.addListener(({ permissions }) => {
+  if (permissions?.includes('history')) {
+    registerHistoryEvents();
+    if (!accountBusy) void refresh();
+  }
+});
+let historyEvents;
+function registerHistoryEvents() {
+  if (!chrome.history || historyEvents === chrome.history) return;
+  historyEvents = chrome.history;
+  historyEvents.onVisited.addListener(item => invalidateVisitCache(item.url));
+  historyEvents.onVisitRemoved.addListener(() => {
+    invalidateDiscoveries(true);
+    invalidateVisitCache();
+    if (!accountBusy) void refresh();
+  });
+}
+registerHistoryEvents();
+initPrivacyPanel();
 initHistoryManager(refresh, displayRange);
 renderSummary(sampleHistory(Number(range.value)));
 void refresh();
