@@ -2,6 +2,8 @@
 
 Daytrail is a Chrome extension that is able to act as a multi-tool package based off your browser activity. It includes a daily activity graph, a chart of your most visited sites, and totals for searches, unique sites, and visits analyzed. It also shows recent search terms and the first date you granted access. Daytrail is able to act as both a quick and more efficient browser history dashboard that's able to change your search history and keep track, and as a fully-fledged site for analysis of activity and changes that you could make. There are also many productivity features, such as blocking websites, being able to see the different categories of sites you use, and setting up pop-ups on sites that might be acting as distractions.
 
+Using the trails feature, you can keep up your workflow by saving certain sites and entering focus mode, so that even after taking a break or losing your place, you can continue immediately.
+
 ## Install and connect
 
 1. Unzip Daytrail if you downloaded the ZIP folder.
