@@ -1,12 +1,12 @@
 # Daytrail
 
-Daytrail is a Chrome extension that summarizes Google searches and website visits saved in your Chrome profile. The dashboard has a daily activity chart, a chart of your most visited sites, and totals for searches, unique sites, and visits analyzed. It also shows recent search terms and the first date you granted access.
+Daytrail is a Chrome extension that is able to act as a multi-tool package based off your browser activity. It includes a daily activity graph, a chart of your most visited sites, and totals for searches, unique sites, and visits analyzed. It also shows recent search terms and the first date you granted access. Daytrail is able to act as both a quick and more efficient browser history dashboard that's able to change your search history and keep track, and as a fully-fledged site for analysis of activity and changes that you could make. There are also many productivity features, such as blocking websites, being able to see the different categories of sites you use, and setting up pop-ups on sites that might be acting as distractions.
 
 ## Install and connect
 
-1. Unzip Daytrail if you downloaded the ZIP.
+1. Unzip Daytrail if you downloaded the ZIP folder.
 2. In the desktop Chrome profile you normally use, open `chrome://extensions`. Turn on **Developer mode**, choose **Load unpacked**, and select the **Daytrail** folder containing `manifest.json`. If you already installed this folder, click **Reload** on its extension card.
-3. Open Daytrail from Chrome’s **Extensions** menu. The dashboard opens in a new tab with labeled sample data.
+3. Open Daytrail from Chrome’s **Extensions** menu. The dashboard opens in a new tab with labeled sample data by default.
 4. Click **Connect Google account**. Use the same account you’re signed into in Chrome. This build already includes the Google OAuth client ID.
 5. Click **Allow history access** and approve Chrome’s history permission. The dashboard will load activity saved in this Chrome profile.
 
